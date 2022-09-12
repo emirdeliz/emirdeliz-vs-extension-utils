@@ -4,5 +4,6 @@
   "description": "Vs extension utils",
   "main": "index.js",
   "author": "Emir Marques - <emirdeliz@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+	"repository": "https://github.com/emirdeliz/emirdeliz-vs-extension-utils"
 }
