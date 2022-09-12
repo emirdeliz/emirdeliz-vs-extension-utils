@@ -1,9 +1,17 @@
 {
-  "name": "emirdeliz-vs-extension-utils",
-  "version": "1.0.0",
-  "description": "Vs extension utils",
-  "main": "index.js",
-  "author": "Emir Marques - <emirdeliz@gmail.com>",
-  "license": "MIT",
-	"repository": "https://github.com/emirdeliz/emirdeliz-vs-extension-utils"
+	"name": "emirdeliz-vs-extension-utils",
+	"version": "1.0.0",
+	"description": "Vs extension utils",
+	"main": "index.js",
+	"author": "Emir Marques - <emirdeliz@gmail.com>",
+	"license": "MIT",
+	"repository": "https://github.com/emirdeliz/emirdeliz-vs-extension-utils",
+	"devDependencies": {
+		"@types/node": "16.x",
+		"@types/vscode": "^1.71.0",
+		"@typescript-eslint/eslint-plugin": "^5.31.0",
+		"@typescript-eslint/parser": "^5.31.0",
+		"eslint": "^8.20.0",
+		"typescript": "^4.7.4"
+	}
 }
