@@ -1,0 +1,8 @@
+{
+  "name": "emirdeliz-vs-extension-utils",
+  "version": "1.0.0",
+  "description": "Vs extension utils",
+  "main": "index.js",
+  "author": "Emir Marques - <emirdeliz@gmail.com>",
+  "license": "MIT"
+}
