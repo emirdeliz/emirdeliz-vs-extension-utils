@@ -2,7 +2,7 @@
 	"name": "emirdeliz-vs-extension-utils",
 	"version": "1.0.0",
 	"description": "Vs extension utils",
-	"main": "index.js",
+	"main": "src/index.ts",
 	"author": "Emir Marques - <emirdeliz@gmail.com>",
 	"license": "MIT",
 	"repository": "https://github.com/emirdeliz/emirdeliz-vs-extension-utils",
