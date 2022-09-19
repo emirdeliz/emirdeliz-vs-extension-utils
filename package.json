@@ -2,10 +2,14 @@
 	"name": "emirdeliz-vs-extension-utils",
 	"version": "1.0.0",
 	"description": "Vs extension utils",
-	"main": "src/index.ts",
+	"main": "out/index.js",
 	"author": "Emir Marques - <emirdeliz@gmail.com>",
 	"license": "MIT",
 	"repository": "https://github.com/emirdeliz/emirdeliz-vs-extension-utils",
+	"scripts": {
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./"
+	},
 	"devDependencies": {
 		"@types/node": "16.x",
 		"@types/vscode": "^1.71.0",
