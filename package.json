@@ -3,12 +3,14 @@
 	"version": "1.0.0",
 	"description": "Vs extension utils",
 	"main": "out/index.js",
+	"types": "out/index.d.ts",
 	"author": "Emir Marques - <emirdeliz@gmail.com>",
 	"license": "MIT",
 	"repository": "https://github.com/emirdeliz/emirdeliz-vs-extension-utils",
 	"scripts": {
 		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./"
+		"watch": "tsc -watch -p ./",
+		"build:types": "tsc out/index.js --declaration --allowJs --emitDeclarationOnly --outFile out/index.d.ts"
 	},
 	"devDependencies": {
 		"@types/node": "16.x",
