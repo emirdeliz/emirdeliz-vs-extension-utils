@@ -1,7 +1,16 @@
 {
 	"compilerOptions": {
+		"moduleResolution": "node",
 		"module": "commonjs",
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"allowSyntheticDefaultImports": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"emitDeclarationOnly": false,
 		"target": "es2020",
+		"declaration": true,
 		"outDir": "out",
 		"lib": ["es2020"],
 		"sourceMap": true,
@@ -12,5 +21,6 @@
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
 	},
-	"exclude": ["node_modules", ".vscode-test"]
+	"exclude": ["node_modules", ".vscode-test"],
+	"include": ["src/utils.ts"]
 }
