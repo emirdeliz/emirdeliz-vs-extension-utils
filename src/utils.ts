@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 const FLUTTER_NAME_FILE_CONFIG = 'pubspec.yaml';
 const GIT_NAME_FOLDER_CONFIG = '.git';
@@ -39,8 +40,17 @@ export async function getPathFolderFocus() {
 }
 
 export function checkFolderHasFolder(folderPath: string, folder: string) {
-	const dartFileConfigPath = `${folderPath}/${folder}`;
-	return fs.existsSync(dartFileConfigPath);
+	const workspacePath = getWorkspacePath();
+	const workspaceDirBase = workspacePath?.uri?.fsPath;
+	return fs.existsSync(path.join(workspaceDirBase, folderPath, folder));
+}
+
+export function getWorkspacePath() {
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	const workspacePath = workspaceFolders
+		? workspaceFolders[0]
+		: ({} as vscode.WorkspaceFolder);
+	return workspacePath;
 }
 
 export function checkFolderHasGitConfig(folderPath: string) {
@@ -71,7 +81,9 @@ export async function runGitCommand(command: string, workDir?: string) {
 }
 
 export async function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
+	console.log(foldersPathWithGitConfig);
 	for (const folder of foldersPathWithGitConfig) {
+		console.log(`Running git merge on "${folder}"`);
 		await runGitCommand(GIT_COMMANDS.pull, folder);
 	}
 }
