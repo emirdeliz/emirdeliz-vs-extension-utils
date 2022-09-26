@@ -23,12 +23,13 @@ export function getAllFoldersWithGitConfig(
 		settingsKeyBase,
 		settingsKeyGitIgnoreFolder
 	);
-	const workspaceFoldersNoIgnoreFolders = foldersFromDir.filter(
+	const workspaceFoldersWithoutIgnoreFolders = foldersFromDir.filter(
 		(folder) => !ignoreFolders || !ignoreFolders.includes(folder)
 	);
-	return workspaceFoldersNoIgnoreFolders.filter((f) =>
-		checkFolderHasGitConfig(f)
-	);
+	const foldersResult = workspaceFoldersWithoutIgnoreFolders.filter((f) => {
+		return checkFolderHasGitConfig(f);
+	});
+	return foldersResult;
 }
 
 export async function getPathFolderFocus() {
@@ -37,12 +38,12 @@ export async function getPathFolderFocus() {
 	return folderPath;
 }
 
-export async function checkFolderHasFolder(folderPath: string, folder: string) {
+export function checkFolderHasFolder(folderPath: string, folder: string) {
 	const dartFileConfigPath = `${folderPath}/${folder}`;
 	return fs.existsSync(dartFileConfigPath);
 }
 
-export async function checkFolderHasGitConfig(folderPath: string) {
+export function checkFolderHasGitConfig(folderPath: string) {
 	return checkFolderHasFolder(folderPath, GIT_NAME_FOLDER_CONFIG);
 }
 
@@ -70,7 +71,7 @@ export async function runGitCommand(command: string, workDir?: string) {
 }
 
 export async function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
-	for (const folder in foldersPathWithGitConfig) {
+	for (const folder of foldersPathWithGitConfig) {
 		await runGitCommand(GIT_COMMANDS.pull, folder);
 	}
 }
