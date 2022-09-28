@@ -9,7 +9,7 @@
 	"license": "MIT",
 	"repository": "https://github.com/emirdeliz/emirdeliz-vs-extension-utils",
 	"scripts": {
-		"compile": "tsc -p ./",
+		"compile": "tsc -p ./ && yarn build:types",
 		"watch": "tsc -watch -p ./",
 		"build:types": "tsc"
 	},

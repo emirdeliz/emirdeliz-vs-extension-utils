@@ -5,7 +5,8 @@ import * as path from 'path';
 const FLUTTER_NAME_FILE_CONFIG = 'pubspec.yaml';
 const GIT_NAME_FOLDER_CONFIG = '.git';
 const GIT_COMMANDS = {
-	pull: 'pull'
+	pull: 'pull',
+	merge: 'merge,'
 };
 
 let nextTermId = 25041988;
@@ -68,6 +69,7 @@ export function getAllFoldersWithGitConfig(
 		settingsKeyBase,
 		settingsKeyGitIgnoreFolder
 	);
+	console.log({ ignoreFolders });
 	const workspaceFoldersWithoutIgnoreFolders = foldersFromDir.filter(
 		(folder) => !ignoreFolders || !ignoreFolders.includes(folder)
 	);
@@ -103,15 +105,23 @@ export function checkFolderHasGitConfig(folderPath: string) {
 
 export async function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
 	for (const folder of foldersPathWithGitConfig) {
-		console.log(`Running git merge on "${folder}"`);
+		console.log(`Running git ${GIT_COMMANDS.pull} on "${folder}"`);
 		await runGitCommand(GIT_COMMANDS.pull, folder);
 	}
 }
 
+export async function runGitMergeOnFolders(
+	foldersPathWithGitConfig: Array<string>
+) {
+	for (const folder of foldersPathWithGitConfig) {
+		console.log(`Running git ${GIT_COMMANDS.merge} on "${folder}"`);
+		await runGitCommand(GIT_COMMANDS.merge, folder);
+	}
+}
+
 export function getSettingsByKey(settingsExtensionKey: string, settingsKey: string) {
-	const allConfigurations = vscode.workspace.getConfiguration();
-  const allConfigurationsAsJSON = JSON.parse(JSON.stringify(allConfigurations));
-  const editorSettings = allConfigurationsAsJSON.editor;
-	const settingsExtension = editorSettings[settingsExtensionKey] || {};
-	return settingsExtension[settingsKey] as Array<string> || [];
+	const setting = vscode.workspace
+		.getConfiguration(settingsExtensionKey)
+		.get(settingsKey);
+	return setting as Array<String>;
 }
