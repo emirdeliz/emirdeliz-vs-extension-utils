@@ -8,6 +8,50 @@ const GIT_COMMANDS = {
 	pull: 'pull'
 };
 
+let nextTermId = 25041988;
+let terminalInstance = null as vscode.Terminal;
+
+export function createVscodeTerminal() {
+	terminalInstance = vscode.window.createTerminal({
+		name: `Ext Terminal #${nextTermId++}`,
+		hideFromUser: true,
+	});
+	return terminalInstance;;
+}
+
+export function getVscodeTerminalInstanceAndMaybeCreateOne() {
+	if (!terminalInstance) {
+		return createVscodeTerminal();
+	}
+	return terminalInstance;
+}
+
+export function runCommandOnVsTerminal(command: string) {
+	try {
+		const terminal = getVscodeTerminalInstanceAndMaybeCreateOne();
+		terminal.sendText(command);
+	} catch (e) {
+		vscode.window.showErrorMessage(
+			`🥵 An error occurred when executing the dart command: ${e}`
+		);
+	}
+}
+
+export async function runDartCommand(command: string) {
+	const folderPath = await getPathFolderFocus();
+	if (!checkFolderHasFolder(folderPath, FLUTTER_NAME_FILE_CONFIG)) {
+		return;
+	}
+	runCommandOnVsTerminal(command);
+}
+
+export async function runGitCommand(command: string, workDir?: string) {
+	const commandWithMaybeWorkDir = `git ${
+		workDir ? `-C ${workDir} ${command}` : ''
+	}`;
+	runCommandOnVsTerminal(commandWithMaybeWorkDir);
+}
+
 export function getAllFoldersInDir(folderPathBase: string) {
 	return fs.readdirSync(folderPathBase).filter(function (file) {
 		return fs.statSync(`${folderPathBase}/${file}`).isDirectory();
@@ -57,31 +101,7 @@ export function checkFolderHasGitConfig(folderPath: string) {
 	return checkFolderHasFolder(folderPath, GIT_NAME_FOLDER_CONFIG);
 }
 
-export async function runCommand(command: string) {
-	try {
-		await vscode.commands.executeCommand(command);
-	} catch (e) {
-		vscode.window.showErrorMessage(
-			`🥵 An error occurred when executing the dart command: ${e}`
-		);
-	}
-}
-
-export async function runDartCommand(command: string) {
-	const folderPath = await getPathFolderFocus();
-	if (!checkFolderHasFolder(folderPath, FLUTTER_NAME_FILE_CONFIG)) {
-		return;
-	}
-	await runCommand(command);
-}
-
-export async function runGitCommand(command: string, workDir?: string) {
-	const commandWithMaybeWorkDir = `git ${command} ${workDir ? `-C ${workDir}` : ''}`;
-	await runCommand(commandWithMaybeWorkDir);
-}
-
 export async function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
-	console.log(foldersPathWithGitConfig);
 	for (const folder of foldersPathWithGitConfig) {
 		console.log(`Running git merge on "${folder}"`);
 		await runGitCommand(GIT_COMMANDS.pull, folder);
