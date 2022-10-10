@@ -6,7 +6,7 @@ const FLUTTER_NAME_FILE_CONFIG = 'pubspec.yaml';
 const GIT_NAME_FOLDER_CONFIG = '.git';
 const GIT_COMMANDS = {
 	pull: 'pull',
-	merge: 'merge,'
+	merge: 'merge,',
 };
 
 let nextTermId = 25041988;
@@ -17,7 +17,7 @@ export function createVscodeTerminal() {
 		name: `Ext Terminal #${nextTermId++}`,
 		hideFromUser: true,
 	});
-	return terminalInstance;;
+	return terminalInstance;
 }
 
 export function getVscodeTerminalInstanceAndMaybeCreateOne() {
@@ -69,7 +69,6 @@ export function getAllFoldersWithGitConfig(
 		settingsKeyBase,
 		settingsKeyGitIgnoreFolder
 	);
-	console.log({ ignoreFolders });
 	const workspaceFoldersWithoutIgnoreFolders = foldersFromDir.filter(
 		(folder) => !ignoreFolders || !ignoreFolders.includes(folder)
 	);
@@ -103,25 +102,68 @@ export function checkFolderHasGitConfig(folderPath: string) {
 	return checkFolderHasFolder(folderPath, GIT_NAME_FOLDER_CONFIG);
 }
 
-export async function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
-	for (const folder of foldersPathWithGitConfig) {
-		console.log(`Running git ${GIT_COMMANDS.pull} on "${folder}"`);
-		await runGitCommand(GIT_COMMANDS.pull, folder);
+export async function runGitPullOnFolders(
+	foldersPathWithGitConfig: Array<string>
+) {
+	const foldersPromise = [];
+	for (const folder in foldersPathWithGitConfig) {
+		foldersPromise.push(runGitCommand(GIT_COMMANDS.pull, folder));
 	}
+
+	await processStackPromise(foldersPromise, 'Making pull... 🤘');
 }
 
 export async function runGitMergeOnFolders(
 	foldersPathWithGitConfig: Array<string>
 ) {
-	for (const folder of foldersPathWithGitConfig) {
-		console.log(`Running git ${GIT_COMMANDS.merge} on "${folder}"`);
-		await runGitCommand(GIT_COMMANDS.merge, folder);
+	const foldersPromise = [];
+	for (const folder in foldersPathWithGitConfig) {
+		foldersPromise.push(runGitCommand(GIT_COMMANDS.merge, folder));
 	}
+	await processStackPromise(foldersPromise, 'Making merge... 🤘');
 }
 
-export function getSettingsByKey(settingsExtensionKey: string, settingsKey: string) {
+export function getSettingsByKey(
+	settingsExtensionKey: string,
+	settingsKey: string
+) {
 	const setting = vscode.workspace
 		.getConfiguration(settingsExtensionKey)
 		.get(settingsKey);
 	return setting as Array<String>;
+}
+
+export async function processStackPromise<T>(
+	promiseArray: Array<Promise<T | undefined>>,
+	title: string
+) {
+	vscode.window.withProgress(
+		{
+			location: vscode.ProgressLocation.Notification,
+			title: title
+		},
+		async (progress) => {
+			progress.report({ increment: 0 });
+
+			let promise = null;
+			const promiseAllLength = promiseArray.length;
+
+			while ((promise = promiseArray.pop())) {
+				await new Promise<void>((resolve) => {
+					setTimeout(async () => {
+						await promise;
+						resolve();
+					}, 1000);
+				});
+
+				const incrementPercentage = 100 / promiseAllLength || 1;
+				const promiseDoneLength = promiseAllLength - promiseArray.length;
+				const message = `Running ${promiseDoneLength} of ${promiseAllLength}`;
+				progress.report({
+					increment: incrementPercentage,
+					message,
+				});
+			}
+		}
+	);
 }
