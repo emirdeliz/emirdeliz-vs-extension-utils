@@ -1,0 +1,13 @@
+{
+	"deno.enable": true,
+	"deno.unstable": true,
+	"deno.path": "/opt/homebrew/bin/deno",
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "denoland.vscode-deno",
+	"[typescript]": {
+		"editor.defaultFormatter": "denoland.vscode-deno"
+	},
+	"[ignore]": {
+		"editor.defaultFormatter": "foxundermoon.shell-format"
+	}
+}
