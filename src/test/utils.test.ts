@@ -1,24 +1,33 @@
-// url_test.ts
-import { assertEquals } from 'https://deno.land/std@0.161.0/testing/asserts.ts';
+import {
+  assertEquals,
+  assertMatch,
+  assertNotEquals,
+} from "https://deno.land/std@0.161.0/testing/asserts.ts";
+import * as utils from "../utils.ts";
 
-Deno.test('url test', () => {
-	const url = new URL('./foo.js', 'https://deno.land/');
-	assertEquals(url.href, 'https://deno.land/foo.js');
+Deno.test("Have terminal on vscode when run createVscodeTerminal", function () {
+  const terminal = utils.createVscodeTerminal();
+  assertNotEquals(terminal, null);
+  assertMatch(
+    terminal.name,
+    new RegExp(utils.EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME, "g"),
+  );
 });
 
-// import * as assert from 'assert';
-// import { after } from 'mocha';
+Deno.test("Have terminal on vscode when run getVscodeTerminal", function () {
+  const terminal = utils.getVscodeTerminal();
+  assertNotEquals(terminal, null);
+  assertMatch(
+    terminal.name,
+    new RegExp(utils.EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME, "g"),
+  );
+});
 
-// // You can import and use all API from the 'vscode' module
-// // as well as import your extension to test it
-// import * as vscode from 'vscode';
-// // import * as myExtension from '../../extension';
-
-// suite('Extension Test Suite', () => {
-// 	vscode.window.showInformationMessage('Start all tests.');
-
-// 	test('Sample test', () => {
-// 		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-// 		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
-// 	});
-// });
+Deno.test("Have command on vscode terminal when run runCommandOnVsTerminal", function () {
+  const commandParam = "Test command";
+  const terminal = utils.getVscodeTerminal();
+  terminal.window.onDidWriteTerminalData(function ({ data }: { data: string }) {
+    assertEquals(data, commandParam);
+  });
+  terminal.sendText(`echo "${commandParam}"`);
+});

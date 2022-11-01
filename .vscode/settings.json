@@ -1,13 +1,16 @@
 {
 	"deno.enable": true,
+	"deno.lint": true,
 	"deno.unstable": true,
-	"deno.path": "/opt/homebrew/bin/deno",
+	"deno.enablePaths": ["."],
 	"editor.formatOnSave": true,
-	"editor.defaultFormatter": "denoland.vscode-deno",
-	"[typescript]": {
-		"editor.defaultFormatter": "denoland.vscode-deno"
+	"deno.suggest.imports.autoDiscover": true,
+	"deno.suggest.imports.hosts": {
+		"https://deno.land": true,
+		"https://cdn.jsdelivr.net": true
 	},
-	"[ignore]": {
-		"editor.defaultFormatter": "foxundermoon.shell-format"
+	"[typescript]": {
+		"editor.defaultFormatter": "denoland.vscode-deno",
+		"editor.wordBasedSuggestions": false
 	}
 }

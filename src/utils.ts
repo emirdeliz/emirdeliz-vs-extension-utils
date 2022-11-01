@@ -1,8 +1,8 @@
-import * as vscode from "https://cdn.jsdelivr.net/npm/@types/vscode@1.72.0/index.d.ts";
+import * as vscode from "https://cdn.jsdelivr.net/npm/@types/vscode@1.64.0/index.d.ts";
 
-const FLUTTER_NAME_FILE_CONFIG = "pubspec.yaml";
-const GIT_NAME_FOLDER_CONFIG = ".git";
-const GIT_COMMANDS = {
+export const EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME = "Ext utils";
+export const EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG = ".git";
+export const EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS = {
   pull: "pull",
   merge: "merge,",
 };
@@ -12,13 +12,13 @@ let terminalInstance = null as vscode.Terminal;
 
 export function createVscodeTerminal() {
   terminalInstance = vscode.window.createTerminal({
-    name: `Ext Terminal #${nextTermId++}`,
+    name: `${EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME} #${nextTermId++}`,
     hideFromUser: true,
   });
   return terminalInstance;
 }
 
-export function getVscodeTerminalInstanceAndMaybeCreateOne() {
+export function getVscodeTerminal() {
   if (!terminalInstance) {
     return createVscodeTerminal();
   }
@@ -27,9 +27,8 @@ export function getVscodeTerminalInstanceAndMaybeCreateOne() {
 
 export function runCommandOnVsTerminal(command: string) {
   try {
-    const terminal = getVscodeTerminalInstanceAndMaybeCreateOne();
+    const terminal = getVscodeTerminal();
     terminal.sendText(command);
-    terminal.sendText;
   } catch (e) {
     vscode.window.showErrorMessage(
       `🥵 An error occurred when executing the dart command: ${e}`,
@@ -37,13 +36,13 @@ export function runCommandOnVsTerminal(command: string) {
   }
 }
 
-export async function runDartCommand(command: string) {
-  const folderPath = await getPathFolderFocus();
-  if (!checkFolderHasFolder(folderPath, FLUTTER_NAME_FILE_CONFIG)) {
-    return;
-  }
-  return runCommandOnVsTerminal(command);
-}
+// export async function runDartCommand(command: string) {
+//   const folderPath = await getPathFolderFocus();
+//   if (!checkFolderHasFolder(folderPath, FLUTTER_NAME_FILE_CONFIG)) {
+//     return;
+//   }
+//   return runCommandOnVsTerminal(command);
+// }
 
 export function runGitCommand(command: string, workDir?: string) {
   const commandWithMaybeWorkDir = `git ${
@@ -119,7 +118,10 @@ export function getWorkspacePath() {
 }
 
 export function checkFolderHasGitConfig(folderPath: string) {
-  return checkFolderHasFolder(folderPath, GIT_NAME_FOLDER_CONFIG);
+  return checkFolderHasFolder(
+    folderPath,
+    EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG,
+  );
 }
 
 export function runGitPullOnFolders(
@@ -128,7 +130,9 @@ export function runGitPullOnFolders(
   const foldersPromise = [];
   for (const folder in foldersPathWithGitConfig) {
     foldersPromise.push(
-      Promise.resolve(runGitCommand(GIT_COMMANDS.pull, folder)),
+      Promise.resolve(
+        runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.pull, folder),
+      ),
     );
   }
 
@@ -141,7 +145,9 @@ export function runGitMergeOnFolders(
   const foldersPromise = [];
   for (const folder in foldersPathWithGitConfig) {
     foldersPromise.push(
-      Promise.resolve(runGitCommand(GIT_COMMANDS.merge, folder)),
+      Promise.resolve(
+        runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.merge, folder),
+      ),
     );
   }
   processStackPromise<void>(foldersPromise, "Making merge... 🤘");
