@@ -1,4 +1,4 @@
-import * as vscode from "https://cdn.jsdelivr.net/npm/@types/vscode@1.64.0/index.d.ts";
+import vscode from "https://cdn.jsdelivr.net/npm/@types/vscode@1.71.0/index.d.ts";
 
 export const EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME = "Ext utils";
 export const EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG = ".git";
