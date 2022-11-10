@@ -1,0 +1,11 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es2022",
+		"outDir": "out",
+		"lib": ["es2022"],
+		"declaration": true
+	},
+	"exclude": ["node_modules", ".vscode-test"],
+	"include": ["src/utils.ts"]
+}

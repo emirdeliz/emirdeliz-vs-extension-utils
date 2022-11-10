@@ -1,4 +1,6 @@
-import vscode from "https://cdn.jsdelivr.net/npm/@types/vscode@1.71.0/index.d.ts";
+import * as fs from 'fs';
+import * as vscode from 'vscode';
+import * as path from 'path';
 
 export const EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME = "Ext utils";
 export const EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG = ".git";
@@ -51,38 +53,29 @@ export function runGitCommand(command: string, workDir?: string) {
   return runCommandOnVsTerminal(commandWithMaybeWorkDir);
 }
 
-export async function getAllFoldersInDir(folderPathBase: string) {
-  const folders = [] as Array<Deno.DirEntry>;
-  for await (const dirEntry of Deno.readDir(folderPathBase)) {
-    if (dirEntry.isDirectory) {
-      folders.push(dirEntry);
-    }
-  }
-  return folders;
+export function getAllFoldersInDir(folderPathBase: string) {
+	return fs.readdirSync(folderPathBase).filter(function (file) {
+		return fs.statSync(`${folderPathBase}/${file}`).isDirectory();
+	});
 }
 
-export async function getAllFoldersWithGitConfig(
-  folderPathBase: string,
-  settingsKeyBase: string,
-  settingsKeyGitIgnoreFolder: string,
+export function getAllFoldersWithGitConfig(
+	folderPathBase: string,
+	settingsKeyBase: string,
+	settingsKeyGitIgnoreFolder: string
 ) {
-  const foldersFromDir = await getAllFoldersInDir(folderPathBase);
-  const ignoreFolders = getSettingsByKey(
-    settingsKeyBase,
-    settingsKeyGitIgnoreFolder,
-  );
-  const workspaceFoldersWithoutIgnoreFolders = [] as Array<Deno.DirEntry>;
-  for (const dirEntry of foldersFromDir) {
-    const isIgnoredFolder = !ignoreFolders ||
-      !ignoreFolders.includes(dirEntry.name);
-    if (!isIgnoredFolder) {
-      workspaceFoldersWithoutIgnoreFolders.push(dirEntry);
-    }
-  }
-  const foldersResult = workspaceFoldersWithoutIgnoreFolders.filter((f) => {
-    return checkFolderHasGitConfig(f.name);
-  });
-  return foldersResult;
+	const foldersFromDir = getAllFoldersInDir(folderPathBase);
+	const ignoreFolders = getSettingsByKey(
+		settingsKeyBase,
+		settingsKeyGitIgnoreFolder
+	);
+	const workspaceFoldersWithoutIgnoreFolders = foldersFromDir.filter(
+		(folder) => !ignoreFolders || !ignoreFolders.includes(folder)
+	);
+	const foldersResult = workspaceFoldersWithoutIgnoreFolders.filter((f) => {
+		return checkFolderHasGitConfig(f);
+	});
+	return foldersResult;
 }
 
 export async function getPathFolderFocus() {
@@ -91,22 +84,10 @@ export async function getPathFolderFocus() {
   return folderPath;
 }
 
-export async function checkFolderHasFolder(folderPath: string, folder: string) {
-  const workspacePath = getWorkspacePath();
-  const workspaceDirBase = workspacePath?.uri?.fsPath;
-  try {
-    await Deno.stat([workspaceDirBase, folderPath, folder].join("/"));
-    // successful, file or directory must exist
-    return true;
-  } catch (error) {
-    if (error instanceof Deno.errors.NotFound) {
-      // file or directory does not exist
-      return false;
-    } else {
-      // unexpected error, maybe permissions, pass it along
-      throw error;
-    }
-  }
+export function checkFolderHasFolder(folderPath: string, folder: string) {
+	const workspacePath = getWorkspacePath();
+	const workspaceDirBase = workspacePath?.uri?.fsPath;
+	return fs.existsSync(path.join(workspaceDirBase, folderPath, folder));
 }
 
 export function getWorkspacePath() {
@@ -172,7 +153,7 @@ export function processStackPromise<T>(
       location: vscode.ProgressLocation.Notification,
       title: title,
     },
-    async function (progress: vscode.window.ProgressOptions) {
+    async function (progress) {
       progress.report({ increment: 0 });
 
       const promiseAllLength = promiseArray.length;
