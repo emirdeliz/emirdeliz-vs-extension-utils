@@ -42,8 +42,14 @@ describe('runCommandOnVsTerminal', () => {
 	});
 
 	it('runCommandOnVsTerminal should return expected output', () => {
-		// const retValue = runCommandOnVsTerminal(command);
-		expect(false).toBeTruthy();
+		let successfully = false;
+		try {
+			const command = 'echo "Hello World"';
+			runCommandOnVsTerminal(command);
+			successfully = true;
+		} catch (e) {}
+		expect(runCommandOnVsTerminal).toBeCalled();
+		expect(successfully).toBeTruthy();
 	});
 });
 

@@ -1,9 +1,7 @@
 out
 dist
+coverage
 node_modules
 .vscode-test/
 .history
 *.vsix
-
-https://github.com/dart-lang/build/blob/master/docs/getting_started.md
-https://pub.dev/packages/build
