@@ -1,56 +1,44 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as path from 'path';
-
-export const EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME = "Ext utils";
-export const EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG = ".git";
-export const EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS = {
-  pull: "pull",
-  merge: "merge,",
-};
+import * as constants from './constants';
 
 let nextTermId = 25041988;
-let terminalInstance = null as vscode.Terminal;
+let terminalInstance = {} as vscode.Terminal;
 
 export function createVscodeTerminal() {
-  terminalInstance = vscode.window.createTerminal({
-    name: `${EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME} #${nextTermId++}`,
-    hideFromUser: true,
-  });
-  return terminalInstance;
+	terminalInstance = vscode.window.createTerminal({
+		name: `${
+			constants.EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME
+		} #${nextTermId++}`,
+		hideFromUser: true,
+	});
+	return terminalInstance;
 }
 
 export function getVscodeTerminal() {
-  if (!terminalInstance) {
-    return createVscodeTerminal();
-  }
-  return terminalInstance;
+	if (!terminalInstance) {
+		return createVscodeTerminal();
+	}
+	return terminalInstance;
 }
 
 export function runCommandOnVsTerminal(command: string) {
-  try {
-    const terminal = getVscodeTerminal();
-    terminal.sendText(command);
-  } catch (e) {
-    vscode.window.showErrorMessage(
-      `🥵 An error occurred when executing the dart command: ${e}`,
-    );
-  }
+	try {
+		const terminal = getVscodeTerminal();
+		terminal.sendText(command);
+	} catch (e) {
+		vscode.window.showErrorMessage(
+			`🥵 An error occurred when executing the dart command: ${e}`
+		);
+	}
 }
 
-// export async function runDartCommand(command: string) {
-//   const folderPath = await getPathFolderFocus();
-//   if (!checkFolderHasFolder(folderPath, FLUTTER_NAME_FILE_CONFIG)) {
-//     return;
-//   }
-//   return runCommandOnVsTerminal(command);
-// }
-
 export function runGitCommand(command: string, workDir?: string) {
-  const commandWithMaybeWorkDir = `git ${
-    workDir ? `-C ${workDir} ${command}` : ""
-  }`;
-  return runCommandOnVsTerminal(commandWithMaybeWorkDir);
+	const commandWithMaybeWorkDir = `git ${
+		workDir ? `-C ${workDir} ${command}` : ''
+	}`;
+	return runCommandOnVsTerminal(commandWithMaybeWorkDir);
 }
 
 export function getAllFoldersInDir(folderPathBase: string) {
@@ -79,102 +67,113 @@ export function getAllFoldersWithGitConfig(
 }
 
 export async function getPathFolderFocus() {
-  await vscode.commands.executeCommand("copyFilePath");
-  const folderPath = await vscode.env.clipboard.readText();
-  return folderPath;
+	await vscode.commands.executeCommand('copyFilePath');
+	const folderPath = await vscode.env.clipboard.readText();
+	return folderPath;
 }
 
-export function checkFolderHasFolder(folderPath: string, folder: string) {
+export function checkFolderHasFolder(
+	folderBasePath: string,
+	folderToBeFoundPath: string
+) {
 	const workspacePath = getWorkspacePath();
 	const workspaceDirBase = workspacePath?.uri?.fsPath;
-	return fs.existsSync(path.join(workspaceDirBase, folderPath, folder));
+
+	return fs.existsSync(
+		path.join(workspaceDirBase, folderBasePath, folderToBeFoundPath)
+	);
 }
 
 export function getWorkspacePath() {
-  const workspaceFolders = vscode.workspace.workspaceFolders;
-  const workspacePath = workspaceFolders
-    ? workspaceFolders[0]
-    : ({} as vscode.WorkspaceFolder);
-  return workspacePath;
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	const workspacePath = workspaceFolders
+		? workspaceFolders[0]
+		: ({} as vscode.WorkspaceFolder);
+	return workspacePath;
 }
 
 export function checkFolderHasGitConfig(folderPath: string) {
-  return checkFolderHasFolder(
-    folderPath,
-    EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG,
-  );
+	return checkFolderHasFolder(
+		folderPath,
+		constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG
+	);
 }
 
-export function runGitPullOnFolders(
-  foldersPathWithGitConfig: Array<string>,
-) {
-  const foldersPromise = [];
-  for (const folder in foldersPathWithGitConfig) {
-    foldersPromise.push(
-      Promise.resolve(
-        runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.pull, folder),
-      ),
-    );
-  }
+export function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
+	const foldersPromise = [] as Array<Promise<void>>;
+	for (const folder in foldersPathWithGitConfig) {
+		foldersPromise.push(
+			Promise.resolve(
+				runGitCommand(
+					constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.pull,
+					folder
+				)
+			)
+		);
+	}
 
-  processStackPromise<void>(foldersPromise, "Making pull... 🤘");
+	processStackPromise<void>(foldersPromise, 'Making pull... 🤘');
 }
 
-export function runGitMergeOnFolders(
-  foldersPathWithGitConfig: Array<string>,
-) {
-  const foldersPromise = [];
-  for (const folder in foldersPathWithGitConfig) {
-    foldersPromise.push(
-      Promise.resolve(
-        runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.merge, folder),
-      ),
-    );
-  }
-  processStackPromise<void>(foldersPromise, "Making merge... 🤘");
+export function runGitMergeOnFolders(foldersPathWithGitConfig: Array<string>) {
+	const foldersPromise = [] as Array<Promise<void>>;
+	for (const folder in foldersPathWithGitConfig) {
+		foldersPromise.push(
+			Promise.resolve(
+				runGitCommand(
+					constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.merge,
+					folder
+				)
+			)
+		);
+	}
+	processStackPromise<void>(foldersPromise, 'Making merge... 🤘');
 }
 
 export function getSettingsByKey(
-  settingsExtensionKey: string,
-  settingsKey: string,
+	settingsExtensionKey: string,
+	settingsKey: string
 ) {
-  const setting = vscode.workspace
-    .getConfiguration(settingsExtensionKey)
-    .get(settingsKey);
-  return setting as Array<string>;
+	const settings = vscode.workspace.getConfiguration(settingsExtensionKey);
+	const settingValue = settings?.get(settingsKey);
+	return settingValue as Array<string>;
 }
 
 export function processStackPromise<T>(
-  promiseArray: Array<Promise<T | undefined>>,
-  title: string,
+	promiseArray: Array<Promise<T | undefined>>,
+	title: string
 ) {
-  vscode.window.withProgress(
-    {
-      location: vscode.ProgressLocation.Notification,
-      title: title,
-    },
-    async function (progress) {
-      progress.report({ increment: 0 });
+	try {
+		vscode.window.withProgress(
+			{
+				location: vscode.ProgressLocation.Notification,
+				title: title,
+			},
+			async function (progress) {
+				progress.report({ increment: 0 });
 
-      const promiseAllLength = promiseArray.length;
-      let promise = Promise.resolve({} as T) as Promise<T | undefined>;
-      while (promise) {
-        await new Promise<void>((resolve) => {
-          setTimeout(async () => {
-            await promise;
-            resolve();
-          }, 1000);
-        });
+				const promiseAllLength = promiseArray.length;
+				let promise = Promise.resolve({} as T) as Promise<T | undefined>;
+				while (promise) {
+					await new Promise<void>((resolve) => {
+						setTimeout(async () => {
+							await promise;
+							resolve();
+						}, 1000);
+					});
 
-        const incrementPercentage = 100 / promiseAllLength || 1;
-        const promiseDoneLength = promiseAllLength - promiseArray.length;
-        const message = `Running ${promiseDoneLength} of ${promiseAllLength}`;
-        progress.report({
-          increment: incrementPercentage,
-          message,
-        });
-        promise = promiseArray.pop() as Promise<T | undefined>;
-      }
-    },
-  );
+					const incrementPercentage = 100 / promiseAllLength || 1;
+					const promiseDoneLength = promiseAllLength - promiseArray.length;
+					const message = `Running ${promiseDoneLength} of ${promiseAllLength}`;
+					progress.report({
+						increment: incrementPercentage,
+						message,
+					});
+					promise = promiseArray.pop() as Promise<T | undefined>;
+				}
+			}
+		);
+	} catch (e) {
+		console.warn(`Error on process promises: ${e.message}`);
+	}
 }

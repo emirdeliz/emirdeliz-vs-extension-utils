@@ -1,174 +1,227 @@
-import * as vscode from 'vscode';
 import * as utils from '../utils';
+import * as constants from '../constants';
+import * as promises from './__mocks__/promise';
 
-import {
-	createVscodeTerminal,
-	getVscodeTerminal,
-	runCommandOnVsTerminal,
-	runGitCommand,
-	getAllFoldersInDir,
-	getAllFoldersWithGitConfig,
-	getPathFolderFocus,
-	checkFolderHasFolder,
-	getWorkspacePath,
-	checkFolderHasGitConfig,
-	runGitPullOnFolders,
-	runGitMergeOnFolders,
-	getSettingsByKey,
-	processStackPromise,
-} from '../utils';
-
-jest.mock('fs');
-jest.mock('vscode');
-jest.mock('path');
-
-describe('createVscodeTerminal', () => {
-	it('should expose a function', () => {
-		expect(createVscodeTerminal).toBeDefined();
+describe('createVscodeTerminal', function () {
+	it('should expose a function', function () {
+		expect(utils.createVscodeTerminal).toBeDefined();
 	});
 
-	it('createVscodeTerminal should return expected output', () => {
+	it('createVscodeTerminal should return expected output', function () {
 		const terminal = utils.createVscodeTerminal();
 		expect(terminal.name).not.toBeNull();
 		expect(terminal.name).toMatch(
-			new RegExp(utils.EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME, 'g')
+			new RegExp(constants.EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME, 'g')
 		);
 	});
 });
 
-describe('runCommandOnVsTerminal', () => {
-	it('should expose a function', () => {
-		expect(runCommandOnVsTerminal).toBeDefined();
+describe('runCommandOnVsTerminal', function () {
+	it('should expose a function', function () {
+		expect(utils.runCommandOnVsTerminal).toBeDefined();
 	});
 
-	it('runCommandOnVsTerminal should return expected output', () => {
+	it('runCommandOnVsTerminal should return expected output', function () {
 		let successfully = false;
+		const utilsSpy = { runCommandOnVsTerminal: utils.runCommandOnVsTerminal };
+		const runCommandOnVsTerminalSpy = jest.spyOn(
+			utilsSpy,
+			'runCommandOnVsTerminal'
+		);
+
 		try {
 			const command = 'echo "Hello World"';
-			runCommandOnVsTerminal(command);
+			utilsSpy.runCommandOnVsTerminal(command);
 			successfully = true;
-		} catch (e) {}
-		expect(runCommandOnVsTerminal).toBeCalled();
+		} catch (e) {
+			successfully = false;
+		}
+		expect(runCommandOnVsTerminalSpy).toHaveBeenCalled();
 		expect(successfully).toBeTruthy();
 	});
 });
 
-describe('runGitCommand', () => {
-	it('should expose a function', () => {
-		expect(runGitCommand).toBeDefined();
+describe('getAllFoldersInDir', function () {
+	it('should expose a function', function () {
+		expect(utils.getAllFoldersInDir).toBeDefined();
 	});
 
-	it('runGitCommand should return expected output', () => {
-		// const retValue = runGitCommand(command,workDir);
-		expect(false).toBeTruthy();
+	it('getAllFoldersInDir should return expected output', function () {
+		const folders = utils.getAllFoldersInDir(
+			constants.EMIRDELIZ_TEST_WORKSPACE_PATH
+		);
+		expect(folders).toHaveLength(5);
+		expect(folders[0]).toEqual('extension');
+		expect(folders[1]).toEqual('repoOne');
+		expect(folders[2]).toEqual('repoTwo');
 	});
 });
 
-describe('getAllFoldersInDir', () => {
-	it('should expose a function', () => {
-		expect(getAllFoldersInDir).toBeDefined();
+describe('getAllFoldersWithGitConfig', function () {
+	it('should expose a function', function () {
+		expect(utils.getAllFoldersWithGitConfig).toBeDefined();
 	});
 
-	it('getAllFoldersInDir should return expected output', () => {
-		// const retValue = getAllFoldersInDir(folderPathBase);
-		expect(false).toBeTruthy();
-	});
-});
-describe('getAllFoldersWithGitConfig', () => {
-	it('should expose a function', () => {
-		expect(getAllFoldersWithGitConfig).toBeDefined();
-	});
-
-	it('getAllFoldersWithGitConfig should return expected output', () => {
-		// const retValue = getAllFoldersWithGitConfig(folderPathBase,settingsKeyBase,settingsKeyGitIgnoreFolder);
-		expect(false).toBeTruthy();
+	it('getAllFoldersWithGitConfig should return expected output', function () {
+		const folders = utils.getAllFoldersWithGitConfig(
+			constants.EMIRDELIZ_TEST_WORKSPACE_PATH,
+			constants.EMIRDELIZ_EXTENSION_UTILS_VSCODE_SETTINGS_PREFIX,
+			constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG
+		);
+		expect(folders).toHaveLength(2);
 	});
 });
 
-describe('getPathFolderFocus', () => {
-	it('should expose a function', () => {
-		expect(getPathFolderFocus).toBeDefined();
+describe('getPathFolderFocus', function () {
+	it('should expose a function', function () {
+		expect(utils.getPathFolderFocus).toBeDefined();
 	});
 
-	it('getPathFolderFocus should return expected output', async () => {
-		// const retValue = await getPathFolderFocus();
-		expect(false).toBeTruthy();
-	});
-});
-
-describe('checkFolderHasFolder', () => {
-	it('should expose a function', () => {
-		expect(checkFolderHasFolder).toBeDefined();
-	});
-
-	it('checkFolderHasFolder should return expected output', () => {
-		// const retValue = checkFolderHasFolder(folderPath,folder);
-		expect(false).toBeTruthy();
+	it('getPathFolderFocus should return expected output', async function () {
+		const folder = await utils.getPathFolderFocus();
+		expect(folder).toEqual(constants.EMIRDELIZ_TEST_WORKSPACE_FOLDER_FOCUS);
 	});
 });
 
-describe('getWorkspacePath', () => {
-	it('should expose a function', () => {
-		expect(getWorkspacePath).toBeDefined();
+describe('checkFolderHasFolder', function () {
+	it('should expose a function', function () {
+		expect(utils.checkFolderHasFolder).toBeDefined();
 	});
 
-	it('getWorkspacePath should return expected output', () => {
-		// const retValue = getWorkspacePath();
-		expect(false).toBeTruthy();
-	});
-});
+	it('checkFolderHasFolder should return expected output', function () {
+		let hasFolder = utils.checkFolderHasFolder('repoOne', '.git');
+		expect(hasFolder).toBeTruthy();
 
-describe('checkFolderHasGitConfig', () => {
-	it('should expose a function', () => {
-		expect(checkFolderHasGitConfig).toBeDefined();
-	});
-
-	it('checkFolderHasGitConfig should return expected output', () => {
-		// const retValue = checkFolderHasGitConfig(folderPath);
-		expect(false).toBeTruthy();
+		hasFolder = utils.checkFolderHasFolder('repoTwo', 'core');
+		expect(hasFolder).toBeFalsy();
 	});
 });
 
-describe('runGitPullOnFolders', () => {
-	it('should expose a function', () => {
-		expect(runGitPullOnFolders).toBeDefined();
+describe('getWorkspacePath', function () {
+	it('should expose a function', function () {
+		expect(utils.getWorkspacePath).toBeDefined();
 	});
 
-	it('runGitPullOnFolders should return expected output', () => {
-		// const retValue = runGitPullOnFolders(foldersPathWithGitConfig);
-		expect(false).toBeTruthy();
-	});
-});
-
-describe('runGitMergeOnFolders', () => {
-	it('should expose a function', () => {
-		expect(runGitMergeOnFolders).toBeDefined();
-	});
-
-	it('runGitMergeOnFolders should return expected output', () => {
-		// const retValue = runGitMergeOnFolders(foldersPathWithGitConfig);
-		expect(false).toBeTruthy();
+	it('getWorkspacePath should return expected output', function () {
+		const path = utils.getWorkspacePath();
+		expect(path).not.toBeUndefined();
+		expect(path.uri).not.toBeUndefined();
+		expect(path.uri.fsPath).toEqual(constants.EMIRDELIZ_TEST_WORKSPACE_PATH);
 	});
 });
 
-describe('getSettingsByKey', () => {
-	it('should expose a function', () => {
-		expect(getSettingsByKey).toBeDefined();
+describe('checkFolderHasGitConfig', function () {
+	it('should expose a function', function () {
+		expect(utils.checkFolderHasGitConfig).toBeDefined();
 	});
 
-	it('getSettingsByKey should return expected output', () => {
-		// const retValue = getSettingsByKey(settingsExtensionKey,settingsKey);
-		expect(false).toBeTruthy();
+	it('checkFolderHasGitConfig should return expected output', function () {
+		let hasConfig = utils.checkFolderHasGitConfig('repoTwo');
+		expect(hasConfig).toBeTruthy();
+
+		hasConfig = utils.checkFolderHasGitConfig('swc');
+		expect(hasConfig).toBeFalsy();
 	});
 });
 
-describe('processStackPromise', () => {
-	it('should expose a function', () => {
-		expect(processStackPromise).toBeDefined();
+describe('runGitPullOnFolders', function () {
+	it('should expose a function', function () {
+		expect(utils.runGitPullOnFolders).toBeDefined();
 	});
 
-	it('processStackPromise should return expected output', () => {
-		// const retValue = processStackPromise(promiseArray,title);
-		expect(false).toBeTruthy();
+	it('runGitPullOnFolders should return expected output', function () {
+		let successfully = false;
+		const utilsSpy = { runGitPullOnFolders: utils.runGitPullOnFolders };
+		const runGitPullOnFoldersSpy = jest.spyOn(utilsSpy, 'runGitPullOnFolders');
+
+		try {
+			const foldersPathWithGitConfig = ['repoOne', 'repoTwo'];
+			utilsSpy.runGitPullOnFolders(foldersPathWithGitConfig);
+			successfully = true;
+		} catch (e) {
+			successfully = false;
+		}
+		expect(runGitPullOnFoldersSpy).toHaveBeenCalled();
+		expect(successfully).toBeTruthy();
+	});
+});
+
+describe('runGitMergeOnFolders', function () {
+	it('should expose a function', function () {
+		expect(utils.runGitMergeOnFolders).toBeDefined();
+	});
+
+	it('runGitMergeOnFolders should return expected output', function () {
+		let successfully = false;
+		const utilsSpy = { runGitMergeOnFolders: utils.runGitMergeOnFolders };
+		const runGitMergeOnFoldersSpy = jest.spyOn(
+			utilsSpy,
+			'runGitMergeOnFolders'
+		);
+
+		try {
+			const foldersPathWithGitConfig = ['repoOne', 'repoTwo'];
+			utilsSpy.runGitMergeOnFolders(foldersPathWithGitConfig);
+			successfully = true;
+		} catch (e) {
+			successfully = false;
+		}
+		expect(runGitMergeOnFoldersSpy).toHaveBeenCalled();
+		expect(successfully).toBeTruthy();
+	});
+});
+
+describe('getSettingsByKey', function () {
+	it('should expose a function', function () {
+		expect(utils.getSettingsByKey).toBeDefined();
+	});
+
+	it('getSettingsByKey should return expected output', function () {
+		const settingValue = utils.getSettingsByKey(
+			constants.EMIRDELIZ_EXTENSION_UTILS_VSCODE_SETTINGS_PREFIX,
+			'other-dir'
+		);
+		expect(settingValue).toEqual('src/other-dir/code');
+	});
+});
+
+describe('processStackPromise', function () {
+	it('should expose a function', function () {
+		expect(utils.processStackPromise).toBeDefined();
+	});
+
+	it('processStackPromise should return expected output', async function () {
+		let successfully = false;
+		const utilsSpy = { processStackPromise: utils.processStackPromise };
+		const processStackPromiseSpy = jest.spyOn(utilsSpy, 'processStackPromise');
+
+		let values = promises.getPromiseTest();
+		try {
+			utilsSpy.processStackPromise(values, 'Processing promises');
+			await Promise.all(values);
+			successfully = true;
+		} catch (e) {
+			successfully = false;
+		}
+
+		expect(processStackPromiseSpy).toHaveBeenCalled();
+		expect(successfully).toBeFalsy();
+
+		successfully = false;
+		values = promises.getPromiseSuccessfullyTest();
+
+		try {
+			utilsSpy.processStackPromise(
+				promises.getPromiseSuccessfullyTest(),
+				'Processing promises'
+			);
+			await Promise.all(values);
+			successfully = true;
+		} catch (e) {
+			successfully = false;
+		}
+
+		expect(processStackPromiseSpy).toHaveBeenCalledTimes(2);
+		expect(successfully).toBeTruthy();
 	});
 });
