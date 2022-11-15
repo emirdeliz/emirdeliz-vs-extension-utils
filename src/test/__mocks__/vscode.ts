@@ -1,9 +1,11 @@
 import * as constants from '../../constants';
 
 export const window = {
-	createTerminal: jest.fn(() => ({
-		name: `${constants.EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME} #0000`,
-	})),
+	createTerminal: jest.fn(function () {
+		return {
+			name: `${constants.EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME} #0000`,
+		};
+	}),
 	showErrorMessage: jest.fn(),
 	showWarningMessage: jest.fn(),
 	withProgress: jest.fn(),

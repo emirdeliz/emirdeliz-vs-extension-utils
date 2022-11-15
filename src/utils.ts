@@ -57,10 +57,14 @@ export function getAllFoldersWithGitConfig(
 		settingsKeyBase,
 		settingsKeyGitIgnoreFolder
 	);
-	const workspaceFoldersWithoutIgnoreFolders = foldersFromDir.filter(
-		(folder) => !ignoreFolders || !ignoreFolders.includes(folder)
-	);
-	const foldersResult = workspaceFoldersWithoutIgnoreFolders.filter((f) => {
+	const workspaceFoldersWithoutIgnoreFolders = foldersFromDir.filter(function (
+		folder
+	) {
+		return !ignoreFolders || !ignoreFolders.includes(folder);
+	});
+	const foldersResult = workspaceFoldersWithoutIgnoreFolders.filter(function (
+		f
+	) {
 		return checkFolderHasGitConfig(f);
 	});
 	return foldersResult;
@@ -155,8 +159,8 @@ export function processStackPromise<T>(
 				const promiseAllLength = promiseArray.length;
 				let promise = Promise.resolve({} as T) as Promise<T | undefined>;
 				while (promise) {
-					await new Promise<void>((resolve) => {
-						setTimeout(async () => {
+					await new Promise<void>(function (resolve) {
+						setTimeout(async function () {
 							await promise;
 							resolve();
 						}, 1000);
