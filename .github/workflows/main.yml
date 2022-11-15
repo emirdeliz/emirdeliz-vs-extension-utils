@@ -16,14 +16,11 @@ jobs:
       - name: Yarn install
         run: yarn install
       - name: Running tests
+        id: test
         run: yarn test
       - run: echo "⏳ This job's status is ${{ job.status }}."
       - name: Running lint
+        id: lint
         run: yarn lint:check
       - run: echo "⏳ This job's status is ${{ job.status }}."
       - run: echo "Everything is OK 🫡 🫡 🫡"
-      - name: Status Badges
-        uses: lucasvanmol/status-badges@v1.2.0
-        with:
-          path: 'README.md'
-          token: ${{ secrets.GITHUB_TOKEN }}

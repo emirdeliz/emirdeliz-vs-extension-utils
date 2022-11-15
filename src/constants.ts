@@ -6,5 +6,5 @@ export const EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS = {
 	merge: 'merge,',
 };
 
-export const EMIRDELIZ_TEST_WORKSPACE_PATH = './src/test/__mocks__/folders';
-export const EMIRDELIZ_TEST_WORKSPACE_FOLDER_FOCUS = './src/utils';
+export const EMIRDELIZ_TEST_WORKSPACE_PATH = 'src/test/__mocks__/folders';
+export const EMIRDELIZ_TEST_WORKSPACE_FOLDER_FOCUS = 'src/utils';
