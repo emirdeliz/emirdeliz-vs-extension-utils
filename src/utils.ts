@@ -182,3 +182,7 @@ export function processStackPromise<T>(
 		console.warn(`Error on process promises: ${e.message}`);
 	}
 }
+
+export function isJestEnvironment() {
+	return process.env.JEST_WORKER_ID !== undefined;
+}
