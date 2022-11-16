@@ -1,37 +1,19 @@
-name: emirdeliz - vs extension utils
+name: CI
 on: [push]
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [16]
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Install dependencies
-        run: yarn
+          check-latest: true
+          cache: 'yarn'
+          cache-dependency-path: functions/yarn.lock
+      - run: |
+          pwd
+          yarn install
+        working-directory: functions
       - name: Running tests
         run: yarn test
-      # - run: npm ci
-      # - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      # - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      # - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      # - name: Check out repository code
-      #   uses: actions/checkout@v3
-      # - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      # - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      # - name: Yarn install
-      #   run: npm install
-      # - name: Running tests
-      #   id: test
-      #   run: npm test
-      # - run: echo "⏳ This job's status is ${{ job.status }}."
-      # - name: Running lint
-      #   id: lint
-      #   run: npm lint:check
-      # - run: echo "⏳ This job's status is ${{ job.status }}."
-      # - run: echo "Everything is OK 🫡 🫡 🫡"
