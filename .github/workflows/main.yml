@@ -7,8 +7,7 @@ jobs:
       - uses: actions/setup-node@v3.5.1
         with:
           node-version: 16
-          check-latest: true
-          cache: 'yarn'
+          check-latest: true'
       - run: |
           pwd
           yarn install
