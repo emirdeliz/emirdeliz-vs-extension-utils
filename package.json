@@ -10,8 +10,7 @@
 	"repository": "https://github.com/emirdeliz/emirdeliz-vs-extension-utils",
 	"scripts": {
 		"build:types": "tsc ./src/utils.ts --outDir dist --declaration --emitDeclarationOnly",
-		"build:file": "npx swc $TARGET --quiet --include-dotfiles --out-dir dist",
-		"build:dist": "TARGET=./src/utils.ts yarn build:file && yarn build:types",
+		"build:dist": "npx swc ./src/utils.ts --quiet --include-dotfiles --out-dir dist && yarn build:types",
 		"test": "jest --clearCache && jest",
 		"test:watch": "jest --watch",
 		"lint:check": "eslint . --ext .ts --fix"
