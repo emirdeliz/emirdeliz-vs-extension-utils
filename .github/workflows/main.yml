@@ -1,33 +1,20 @@
 name: CI
 on: [push]
 jobs:
-  common:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          persist-credentials: false
-          submodules: recursive
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-          cache: yarn
-      - run: yarn install
-
   test:
     runs-on: windows-latest
     steps:
-      - run: common
+      - uses: ./.github/actions/action
       - run: yarn test
 
   lint:
     runs-on: windows-latest
     steps:
-      - run: common
+      - uses: ./.github/actions/action
       - run: yarn lint:check
 
   build:
     runs-on: windows-latest
     steps:
-      - run: common
+      - uses: ./.github/actions/action
       - run: sh scripts/build-bundle.sh

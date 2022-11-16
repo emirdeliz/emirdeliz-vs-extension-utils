@@ -1,0 +1,13 @@
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+        submodules: recursive
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+        cache: yarn
+    - run: yarn install
+      shell: sh
