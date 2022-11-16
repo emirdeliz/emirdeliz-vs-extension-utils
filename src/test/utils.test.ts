@@ -51,9 +51,9 @@ describe('getAllFoldersInDir', function () {
 			constants.EMIRDELIZ_TEST_WORKSPACE_PATH
 		);
 		expect(folders).toHaveLength(5);
-		expect(folders[0]).toEqual('extension');
-		expect(folders[1]).toEqual('repoOne');
-		expect(folders[2]).toEqual('repoTwo');
+		expect(folders[0]).toEqual('data');
+		expect(folders[1]).toEqual('extension');
+		expect(folders[2]).toEqual('repoOne');
 	});
 });
 
