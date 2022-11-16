@@ -10,6 +10,7 @@ jobs:
           check-latest: true'
       - run: |
           pwd
+          ls
           yarn install
       - name: Running tests
         run: yarn test
