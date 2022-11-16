@@ -4,17 +4,29 @@ jobs:
   test:
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          submodules: recursive
       - uses: ./.github/actions/action
       - run: yarn test
 
   lint:
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          submodules: recursive
       - uses: ./.github/actions/action
       - run: yarn lint:check
 
   build:
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          submodules: recursive
       - uses: ./.github/actions/action
       - run: sh scripts/build-bundle.sh
