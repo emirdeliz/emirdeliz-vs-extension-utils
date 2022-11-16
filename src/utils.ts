@@ -42,7 +42,6 @@ export function runGitCommand(command: string, workDir?: string) {
 }
 
 export function getAllFoldersInDir(folderPathBase: string) {
-	console.log({ folderPathBase });
 	return fs.readdirSync(folderPathBase).filter(function (file) {
 		return fs.statSync(`${folderPathBase}/${file}`).isDirectory();
 	});

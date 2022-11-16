@@ -89,7 +89,10 @@ describe('checkFolderHasFolder', function () {
 	});
 
 	it('checkFolderHasFolder should return expected output', function () {
-		let hasFolder = utils.checkFolderHasFolder('repoOne', '.git');
+		let hasFolder = utils.checkFolderHasFolder(
+			'repoOne',
+			constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG
+		);
 		expect(hasFolder).toBeTruthy();
 
 		hasFolder = utils.checkFolderHasFolder('repoTwo', 'core');
