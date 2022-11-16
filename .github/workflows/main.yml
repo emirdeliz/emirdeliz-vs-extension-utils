@@ -8,7 +8,7 @@ jobs:
         with:
           persist-credentials: false
           submodules: recursive
-      - uses: ./.github/actions/action
+      - uses: ./.github/actions
       - run: yarn test
 
   lint:
@@ -18,7 +18,7 @@ jobs:
         with:
           persist-credentials: false
           submodules: recursive
-      - uses: ./.github/actions/action
+      - uses: ./.github/actions
       - run: yarn lint:check
 
   build:
@@ -28,5 +28,5 @@ jobs:
         with:
           persist-credentials: false
           submodules: recursive
-      - uses: ./.github/actions/action
+      - uses: ./.github/actions
       - run: sh scripts/build-bundle.sh
