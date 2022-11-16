@@ -10,10 +10,8 @@ jobs:
           node-version: 16
           check-latest: true
           cache: 'yarn'
-          cache-dependency-path: functions/yarn.lock
       - run: |
           pwd
           yarn install
-        working-directory: functions
       - name: Running tests
         run: yarn test
