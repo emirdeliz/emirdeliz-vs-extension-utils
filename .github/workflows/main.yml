@@ -1,8 +1,8 @@
 name: CI
 on: [push]
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  common:
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
         with:
@@ -13,18 +13,21 @@ jobs:
           node-version: 16.x
           cache: yarn
       - run: yarn install
+
+  test:
+    runs-on: windows-latest
+    steps:
+      - run: common
       - run: yarn test
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          persist-credentials: false
-          submodules: recursive
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-          cache: yarn
-      - run: yarn install
-      - run: yarn lint
+      - run: common
+      - run: yarn lint:check
+
+  build:
+    runs-on: windows-latest
+    steps:
+      - run: common
+      - run: sh scripts/build-bundle.sh
