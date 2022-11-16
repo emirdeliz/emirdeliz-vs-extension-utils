@@ -29,4 +29,4 @@ jobs:
           persist-credentials: false
           submodules: recursive
       - uses: ./.github/actions
-      - run: sh scripts/build-bundle.sh
+      - run: yarn build:dist

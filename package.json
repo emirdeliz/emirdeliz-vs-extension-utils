@@ -11,7 +11,7 @@
 	"scripts": {
 		"build:types": "tsc ./src/utils.ts --outDir dist --declaration --emitDeclarationOnly",
 		"build:file": "npx swc $TARGET --quiet --include-dotfiles --out-dir dist",
-		"build:dist": "TARGET=./src/utils.ts yarn build:file",
+		"build:dist": "TARGET=./src/utils.ts yarn build:file && yarn build:types",
 		"test": "jest --clearCache && jest",
 		"test:watch": "jest --watch",
 		"lint:check": "eslint . --ext .ts --fix"
