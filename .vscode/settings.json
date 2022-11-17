@@ -1,14 +1,4 @@
 {
-	"deno.enable": true,
-	"deno.lint": true,
-	"deno.unstable": true,
-	"deno.enablePaths": ["."],
-	"editor.formatOnSave": true,
-	"deno.suggest.imports.autoDiscover": true,
-	"deno.suggest.imports.hosts": {
-		"https://deno.land": true,
-		"https://cdn.jsdelivr.net": true
-	},
 	"[typescript]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode",
 		"editor.wordBasedSuggestions": false
