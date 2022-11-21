@@ -1,9 +1,9 @@
-import { isJestEnvironment } from './utils';
+import * as utils from './utils';
 
 export const EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME = 'Ext utils';
 export const EMIRDELIZ_EXTENSION_UTILS_VSCODE_SETTINGS_PREFIX = 'emirdeliz-';
 export const EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG =
-	isJestEnvironment() ? 'git' : '.git';
+	utils.isJestEnvironment() ? 'git' : '.git';
 export const EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS = {
 	pull: 'pull',
 	merge: 'merge,',

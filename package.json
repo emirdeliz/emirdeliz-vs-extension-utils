@@ -9,8 +9,8 @@
 	"license": "MIT",
 	"repository": "https://github.com/emirdeliz/emirdeliz-vs-extension-utils",
 	"scripts": {
-		"build:types": "tsc ./src/utils.ts --outDir dist --declaration --emitDeclarationOnly",
-		"build:dist": "npx swc ./src --quiet --out-dir dist && yarn build:types",
+		"build:types": "tsc ./src/index.ts --outDir dist --declaration --emitDeclarationOnly",
+		"build:dist": "swc ./src --quiet --out-file dist/index.js && yarn build:types",
 		"test": "jest --clearCache && jest",
 		"test:watch": "jest --watch",
 		"lint:check": "eslint . --ext .ts --fix"

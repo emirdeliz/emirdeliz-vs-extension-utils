@@ -6,11 +6,13 @@
 			"tsx": false
 		},
 		"target": "es2022",
-		"loose": false
+		"loose": true
 	},
 	"module": {
-		"type": "commonjs"
+		"type": "commonjs",
+		"noInterop": true
 	},
 	"minify": false,
-	"isModule": true
+	"isModule": false,
+	"exclude": ["node_modules", "dist", "src/test"]
 }

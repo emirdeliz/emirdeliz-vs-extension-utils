@@ -1,7 +1,11 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as constants from './constants';
+import {
+	EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME,
+	EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG,
+	EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS,
+} from './constants';
 
 let nextTermId = 25041988;
 let terminalInstance = {} as vscode.Terminal;
@@ -9,7 +13,7 @@ let terminalInstance = {} as vscode.Terminal;
 export function createVscodeTerminal() {
 	terminalInstance = vscode.window.createTerminal({
 		name: `${
-			constants.EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME
+			EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME
 		} #${nextTermId++}`,
 		hideFromUser: true,
 	});
@@ -99,7 +103,7 @@ export function getWorkspacePath() {
 export function checkFolderHasGitConfig(folderPath: string) {
 	return checkFolderHasFolder(
 		folderPath,
-		constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG
+		EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG
 	);
 }
 
@@ -109,7 +113,7 @@ export function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
 		foldersPromise.push(
 			Promise.resolve(
 				runGitCommand(
-					constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.pull,
+					EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.pull,
 					folder
 				)
 			)
@@ -125,7 +129,7 @@ export function runGitMergeOnFolders(foldersPathWithGitConfig: Array<string>) {
 		foldersPromise.push(
 			Promise.resolve(
 				runGitCommand(
-					constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.merge,
+					EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.merge,
 					folder
 				)
 			)
