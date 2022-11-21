@@ -14,5 +14,5 @@
 	},
 	"minify": false,
 	"isModule": false,
-	"exclude": ["node_modules", "dist", "src/test"]
+	"exclude": ["node_modules"]
 }

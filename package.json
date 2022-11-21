@@ -10,10 +10,11 @@
 	"repository": "https://github.com/emirdeliz/emirdeliz-vs-extension-utils",
 	"scripts": {
 		"build:types": "tsc ./src/utils.ts --outDir dist --declaration --emitDeclarationOnly",
-		"build:dist": "swc ./src --quiet --out-file dist/utils.js && yarn build:types",
+		"build:dist": "rm -rf dist && swc ./src --quiet --out-dir dist && yarn build:types",
 		"test": "jest --clearCache && jest",
 		"test:watch": "jest --watch",
-		"lint:check": "eslint . --ext .ts --fix"
+		"lint:check": "eslint . --ext .ts --fix",
+		"postinstall": "yarn build:dist"
 	},
 	"devDependencies": {
 		"@swc/cli": "^0.1.57",
