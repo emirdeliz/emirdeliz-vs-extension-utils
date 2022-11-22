@@ -3,18 +3,14 @@
 	"version": "1.0.0",
 	"description": "Vs extension utils",
 	"type": "commonjs",
-	"types": "dist/utils.d.ts",
-	"main": "dist/utils.js",
+	"main": "src/utils.ts",
 	"author": "Emir Marques - <emirdeliz@gmail.com>",
 	"license": "MIT",
 	"repository": "https://github.com/emirdeliz/emirdeliz-vs-extension-utils",
 	"scripts": {
-		"build:types": "tsc ./src/utils.ts --outDir dist --declaration --emitDeclarationOnly",
-		"build:dist": "rm -rf dist && swc ./src --quiet --out-dir dist && yarn build:types",
 		"test": "jest --clearCache && jest",
 		"test:watch": "jest --watch",
-		"lint:check": "eslint . --ext .ts --fix",
-		"postinstall": "yarn build:dist"
+		"lint:check": "eslint . --ext .ts --fix"
 	},
 	"devDependencies": {
 		"@swc/cli": "^0.1.57",
