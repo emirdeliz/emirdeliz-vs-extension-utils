@@ -48,7 +48,7 @@ const executeCommand = jest.fn(function (command: string) {
 		case 'copyFilePath':
 			return env.clipboard.readText();
 		default:
-			break;
+			return command;
 	}
 });
 

@@ -5,7 +5,7 @@
 			"syntax": "typescript",
 			"tsx": false
 		},
-		"target": "es2022",
+		"target": "es5",
 		"loose": true
 	},
 	"module": {
@@ -13,6 +13,6 @@
 		"noInterop": true
 	},
 	"minify": false,
-	"isModule": false,
+	"isModule": true,
 	"exclude": ["node_modules"]
 }

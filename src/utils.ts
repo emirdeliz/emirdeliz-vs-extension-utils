@@ -12,9 +12,7 @@ let terminalInstance = {} as vscode.Terminal;
 
 export function createVscodeTerminal() {
 	terminalInstance = vscode.window.createTerminal({
-		name: `${
-			EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME
-		} #${nextTermId++}`,
+		name: `${EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME} #${nextTermId++}`,
 		hideFromUser: true,
 	});
 	return terminalInstance;
@@ -112,10 +110,7 @@ export function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
 	for (const folder in foldersPathWithGitConfig) {
 		foldersPromise.push(
 			Promise.resolve(
-				runGitCommand(
-					EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.pull,
-					folder
-				)
+				runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.pull, folder)
 			)
 		);
 	}
@@ -128,10 +123,7 @@ export function runGitMergeOnFolders(foldersPathWithGitConfig: Array<string>) {
 	for (const folder in foldersPathWithGitConfig) {
 		foldersPromise.push(
 			Promise.resolve(
-				runGitCommand(
-					EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.merge,
-					folder
-				)
+				runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.merge, folder)
 			)
 		);
 	}
