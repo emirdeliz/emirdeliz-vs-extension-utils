@@ -19,6 +19,7 @@ const config = {
 	moduleNameMapper: {
 		'^vscode$': '<rootDir>/src/test/__mocks__/vscode.ts',
 	},
+	modulePathIgnorePatterns: ['<rootDir>/dist'],
 } as Config;
 
 export default config;

@@ -1,6 +1,5 @@
 import * as utils from '../utils';
 import * as constants from '../constants';
-import * as promises from './__mocks__/promise';
 
 describe('createVscodeTerminal', function () {
 	it('should expose a function', function () {
@@ -188,43 +187,33 @@ describe('getSettingsByKey', function () {
 	});
 });
 
-describe('processStackPromise', function () {
+describe('showVscodeProgress', function () {
 	it('should expose a function', function () {
-		expect(utils.processStackPromise).toBeDefined();
+		expect(utils.showVscodeProgress).toBeDefined();
 	});
 
-	it('processStackPromise should return expected output', async function () {
-		let successfully = false;
-		const utilsSpy = { processStackPromise: utils.processStackPromise };
-		const processStackPromiseSpy = jest.spyOn(utilsSpy, 'processStackPromise');
-
-		let values = promises.getPromiseTest();
-		try {
-			utilsSpy.processStackPromise(values, 'Processing promises');
-			await Promise.all(values);
-			successfully = true;
-		} catch (e) {
-			successfully = false;
-		}
-
-		expect(processStackPromiseSpy).toHaveBeenCalled();
-		expect(successfully).toBeFalsy();
-
-		successfully = false;
-		values = promises.getPromiseSuccessfullyTest();
-
-		try {
-			utilsSpy.processStackPromise(
-				promises.getPromiseSuccessfullyTest(),
-				'Processing promises'
+	it.each([
+		[22, 7, 32],
+		[22, 11, 50],
+		[22, 18, 82],
+	])(
+		'showVscodeProgress should return expected output when progressStepsSize=%i and  progressDone=%i',
+		function (
+			progressStepsSize: number,
+			progressDone: number,
+			progressExpected: number
+		) {
+			const progressMessageExpected = `Running ${progressDone} of ${progressStepsSize}`;
+			const utilsSpy = { showVscodeProgress: utils.showVscodeProgress };
+			const showVscodeProgressSpy = jest.spyOn(utilsSpy, 'showVscodeProgress');
+			const result = utilsSpy.showVscodeProgress(
+				progressStepsSize,
+				progressDone
 			);
-			await Promise.all(values);
-			successfully = true;
-		} catch (e) {
-			successfully = false;
-		}
 
-		expect(processStackPromiseSpy).toHaveBeenCalledTimes(2);
-		expect(successfully).toBeTruthy();
-	});
+			expect(showVscodeProgressSpy).toHaveBeenCalled();
+			expect(result?.message).toEqual(progressMessageExpected);
+			expect(result?.incrementPercentageRounded).toEqual(progressExpected);
+		}
+	);
 });

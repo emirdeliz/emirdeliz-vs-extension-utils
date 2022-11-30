@@ -6,7 +6,7 @@ export const EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG =
 	utils.isJestEnvironment() ? 'git' : '.git';
 export const EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS = {
 	pull: 'pull',
-	merge: 'merge,',
+	merge: 'merge',
 };
 
 export const EMIRDELIZ_TEST_WORKSPACE_PATH = `${__dirname}/test/__mocks__/folders`;

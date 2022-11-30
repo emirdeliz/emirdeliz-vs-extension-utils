@@ -12,7 +12,9 @@
 		"build:dist": "rm -rf dist && swc ./src --quiet --out-dir dist && yarn build:types",
 		"test": "jest --clearCache && jest",
 		"test:watch": "jest --watch",
-		"lint:check": "eslint . --ext .ts --fix"
+		"lint:check": "eslint . --ext .ts --fix",
+		"clear:dependencies": "rm -rf node_modules && rm -rf yarn.lock",
+		"install:dev": "yarn clear:dependencies && yarn install"
 	},
 	"devDependencies": {
 		"@swc/cli": "^0.1.57",
@@ -20,7 +22,7 @@
 		"@swc/helpers": "^0.4.12",
 		"@swc/jest": "^0.2.23",
 		"@types/jest": "^29.2.2",
-		"@types/node": "16.x",
+		"@types/node": "^18.11.9",
 		"@types/vscode": "^1.71.0",
 		"@typescript-eslint/eslint-plugin": "^5.31.0",
 		"@typescript-eslint/parser": "^5.31.0",
