@@ -135,23 +135,26 @@ async function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
 }
 
 async function runGitMergeOnFolders(foldersPathWithGitConfig: Array<string>) {
-	return await vscode.window.withProgress(
-		{
-			location: vscode.ProgressLocation.Notification,
-			title: 'Making merge... 🤘',
-		},
-		async function (progress) {
-			for (const folder of foldersPathWithGitConfig) {
-				const folderIndex = foldersPathWithGitConfig.indexOf(folder);
-				runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge, folder);
-				await showVscodeProgress(
-					foldersPathWithGitConfig.length,
-					folderIndex,
-					progress
-				);
+	return new Promise<void>(function (resolve) {
+		vscode.window.withProgress(
+			{
+				location: vscode.ProgressLocation.Notification,
+				title: 'Making merge... 🤘',
+			},
+			async function (progress) {
+				for (const folder of foldersPathWithGitConfig) {
+					const folderIndex = foldersPathWithGitConfig.indexOf(folder);
+					runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge, folder);
+					await showVscodeProgress(
+						foldersPathWithGitConfig.length,
+						folderIndex,
+						progress
+					);
+				}
+				resolve();
 			}
-		}
-	);
+		);
+	});
 }
 
 function getSettingsByKey(settingsExtensionKey: string, settingsKey: string) {
