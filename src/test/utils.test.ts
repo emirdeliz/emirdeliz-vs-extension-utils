@@ -1,5 +1,6 @@
 import * as utils from '../utils';
 import * as constants from '../constants';
+import * as vscode from './__mocks__/vscode';
 
 describe('createVscodeTerminal', function () {
 	it('should expose a function', function () {
@@ -198,7 +199,7 @@ describe('showVscodeProgress', function () {
 		[22, 18, 82],
 	])(
 		'showVscodeProgress should return expected output when progressStepsSize=%i and  progressDone=%i',
-		function (
+		async function (
 			progressStepsSize: number,
 			progressDone: number,
 			progressExpected: number
@@ -206,14 +207,22 @@ describe('showVscodeProgress', function () {
 			const progressMessageExpected = `Running ${progressDone} of ${progressStepsSize}`;
 			const utilsSpy = { showVscodeProgress: utils.showVscodeProgress };
 			const showVscodeProgressSpy = jest.spyOn(utilsSpy, 'showVscodeProgress');
-			const result = utilsSpy.showVscodeProgress(
-				progressStepsSize,
-				progressDone
-			);
+			await vscode.window.withProgress(
+				{
+					title: 'Making merge... 🤘',
+				},
+				async function (progress) {
+					const result = (await utilsSpy.showVscodeProgress(
+						progressStepsSize,
+						progressDone,
+						progress
+					)) as utils.ProgressData;
 
-			expect(showVscodeProgressSpy).toHaveBeenCalled();
-			expect(result?.message).toEqual(progressMessageExpected);
-			expect(result?.incrementPercentageRounded).toEqual(progressExpected);
+					expect(showVscodeProgressSpy).toHaveBeenCalled();
+					expect(result?.message).toEqual(progressMessageExpected);
+					expect(result?.incrementPercentageRounded).toEqual(progressExpected);
+				}
+			);
 		}
 	);
 });

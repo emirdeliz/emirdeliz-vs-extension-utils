@@ -7,6 +7,12 @@ import {
 	EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS,
 } from './constants';
 
+export interface ProgressData {
+	message?: string | undefined;
+	increment?: number | undefined;
+	incrementPercentageRounded?: number;
+}
+
 let nextTermId = 25041988;
 let terminalInstance = {} as vscode.Terminal;
 
@@ -105,28 +111,44 @@ function checkFolderHasGitConfig(folderPath: string) {
 	);
 }
 
-function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
-	for (const folder of foldersPathWithGitConfig) {
-		const folderIndex = foldersPathWithGitConfig.indexOf(folder);
-		runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull, folder);
-		showVscodeProgress(
-			foldersPathWithGitConfig.length,
-			folderIndex,
-			'Making pull... 🤘'
-		);
-	}
+async function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
+	await vscode.window.withProgress(
+		{
+			location: vscode.ProgressLocation.Notification,
+			title: 'Making pull... 🤘',
+		},
+		async function (progress) {
+			for (const folder of foldersPathWithGitConfig) {
+				const folderIndex = foldersPathWithGitConfig.indexOf(folder);
+				runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull, folder);
+				await showVscodeProgress(
+					foldersPathWithGitConfig.length,
+					folderIndex,
+					progress
+				);
+			}
+		}
+	);
 }
 
-function runGitMergeOnFolders(foldersPathWithGitConfig: Array<string>) {
-	for (const folder of foldersPathWithGitConfig) {
-		const folderIndex = foldersPathWithGitConfig.indexOf(folder);
-		runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge, folder);
-		showVscodeProgress(
-			foldersPathWithGitConfig.length,
-			folderIndex,
-			'Making merge... 🤘'
-		);
-	}
+async function runGitMergeOnFolders(foldersPathWithGitConfig: Array<string>) {
+	await vscode.window.withProgress(
+		{
+			location: vscode.ProgressLocation.Notification,
+			title: 'Making merge... 🤘',
+		},
+		async function (progress) {
+			for (const folder of foldersPathWithGitConfig) {
+				const folderIndex = foldersPathWithGitConfig.indexOf(folder);
+				runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge, folder);
+				await showVscodeProgress(
+					foldersPathWithGitConfig.length,
+					folderIndex,
+					progress
+				);
+			}
+		}
+	);
 }
 
 function getSettingsByKey(settingsExtensionKey: string, settingsKey: string) {
@@ -138,29 +160,25 @@ function getSettingsByKey(settingsExtensionKey: string, settingsKey: string) {
 function showVscodeProgress(
 	progressStepsSize: number,
 	progressDone: number,
-	title?: string
+	progress: vscode.Progress<ProgressData>
 ) {
 	try {
-		const incrementPercentage = (progressDone * 100) / progressStepsSize;
+		const incrementPercentage = 100 / progressStepsSize;
 		const incrementPercentageRounded = Math.min(
 			Math.round(incrementPercentage),
 			100
 		);
 
 		const message = `Running ${progressDone + 1} of ${progressStepsSize}`;
-		vscode.window.withProgress(
-			{
-				location: vscode.ProgressLocation.Notification,
-				title: title || 'Processing',
-			},
-			async function (progress) {
+		return new Promise(function (resolve) {
+			setTimeout(function () {
 				progress.report({
 					increment: incrementPercentageRounded,
 					message,
 				});
-			}
-		);
-		return { message, incrementPercentageRounded };
+				resolve({ message, incrementPercentageRounded });
+			}, 1000);
+		});
 	} catch (e) {
 		console.warn(`Error on process promises: ${e.message}`);
 	}
