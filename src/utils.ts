@@ -108,7 +108,7 @@ function checkFolderHasGitConfig(folderPath: string) {
 function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
 	for (const folder of foldersPathWithGitConfig) {
 		const folderIndex = foldersPathWithGitConfig.indexOf(folder);
-		runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.pull, folder);
+		runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull, folder);
 		showVscodeProgress(
 			foldersPathWithGitConfig.length,
 			folderIndex,
@@ -120,7 +120,7 @@ function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
 function runGitMergeOnFolders(foldersPathWithGitConfig: Array<string>) {
 	for (const folder of foldersPathWithGitConfig) {
 		const folderIndex = foldersPathWithGitConfig.indexOf(folder);
-		runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.merge, folder);
+		runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge, folder);
 		showVscodeProgress(
 			foldersPathWithGitConfig.length,
 			folderIndex,
@@ -147,14 +147,13 @@ function showVscodeProgress(
 			100
 		);
 
-		const message = `Running ${progressDone} of ${progressStepsSize}`;
+		const message = `Running ${progressDone + 1} of ${progressStepsSize}`;
 		vscode.window.withProgress(
 			{
 				location: vscode.ProgressLocation.Notification,
 				title: title || 'Processing',
 			},
 			async function (progress) {
-				progress.report({ increment: 0 });
 				progress.report({
 					increment: incrementPercentageRounded,
 					message,
