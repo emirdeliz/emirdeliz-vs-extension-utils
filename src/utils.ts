@@ -112,27 +112,30 @@ function checkFolderHasGitConfig(folderPath: string) {
 }
 
 async function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
-	await vscode.window.withProgress(
-		{
-			location: vscode.ProgressLocation.Notification,
-			title: 'Making pull... 🤘',
-		},
-		async function (progress) {
-			for (const folder of foldersPathWithGitConfig) {
-				const folderIndex = foldersPathWithGitConfig.indexOf(folder);
-				runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull, folder);
-				await showVscodeProgress(
-					foldersPathWithGitConfig.length,
-					folderIndex,
-					progress
-				);
+	return new Promise<void>(function (resolve) {
+		vscode.window.withProgress(
+			{
+				location: vscode.ProgressLocation.Notification,
+				title: 'Making pull... 🤘',
+			},
+			async function (progress) {
+				for (const folder of foldersPathWithGitConfig) {
+					const folderIndex = foldersPathWithGitConfig.indexOf(folder);
+					runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull, folder);
+					await showVscodeProgress(
+						foldersPathWithGitConfig.length,
+						folderIndex,
+						progress
+					);
+				}
+				resolve();
 			}
-		}
-	);
+		);
+	});
 }
 
 async function runGitMergeOnFolders(foldersPathWithGitConfig: Array<string>) {
-	await vscode.window.withProgress(
+	return await vscode.window.withProgress(
 		{
 			location: vscode.ProgressLocation.Notification,
 			title: 'Making merge... 🤘',
