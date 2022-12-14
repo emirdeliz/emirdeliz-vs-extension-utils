@@ -120,11 +120,14 @@ async function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
 			},
 			async function (progress) {
 				for (const folder of foldersPathWithGitConfig) {
-					const folderIndex = foldersPathWithGitConfig.indexOf(folder);
 					runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull, folder);
+					const progressTitle = buildGitProgressTitle(
+						folder,
+						foldersPathWithGitConfig
+					);
 					await showVscodeProgress(
 						foldersPathWithGitConfig.length,
-						folderIndex,
+						progressTitle,
 						progress
 					);
 				}
@@ -143,11 +146,14 @@ async function runGitMergeOnFolders(foldersPathWithGitConfig: Array<string>) {
 			},
 			async function (progress) {
 				for (const folder of foldersPathWithGitConfig) {
-					const folderIndex = foldersPathWithGitConfig.indexOf(folder);
 					runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge, folder);
+					const progressTitle = buildGitProgressTitle(
+						folder,
+						foldersPathWithGitConfig
+					);
 					await showVscodeProgress(
 						foldersPathWithGitConfig.length,
-						folderIndex,
+						progressTitle,
 						progress
 					);
 				}
@@ -163,9 +169,22 @@ function getSettingsByKey(settingsExtensionKey: string, settingsKey: string) {
 	return settingValue as Array<string>;
 }
 
+export function buildGitProgressTitle(
+	currentFolderName: string,
+	foldersName: Array<string>
+) {
+	const folderNameTruncateLength = 20;
+	const folderNameReachedLimit =
+		currentFolderName.length > folderNameTruncateLength;
+	const currentFolderIndex = foldersName.indexOf(currentFolderName) + 1;
+	return `Running on ${currentFolderName.substring(0, 20)}${
+		folderNameReachedLimit ? '...' : ''
+	} (${currentFolderIndex} of ${foldersName.length})`;
+}
+
 function showVscodeProgress(
 	progressStepsSize: number,
-	progressDone: number,
+	progressTitle: string,
 	progress: vscode.Progress<ProgressData>
 ) {
 	try {
@@ -175,14 +194,13 @@ function showVscodeProgress(
 			100
 		);
 
-		const message = `Running ${progressDone + 1} of ${progressStepsSize}`;
 		return new Promise(function (resolve) {
 			setTimeout(function () {
 				progress.report({
 					increment: incrementPercentageRounded,
-					message,
+					message: progressTitle,
 				});
-				resolve({ message, incrementPercentageRounded });
+				resolve({ progressTitle, incrementPercentageRounded });
 			}, 1000);
 		});
 	} catch (e) {

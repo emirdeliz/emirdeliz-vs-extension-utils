@@ -188,33 +188,66 @@ describe('getSettingsByKey', function () {
 	});
 });
 
+describe('buildGitProgressTitle', function () {
+	it('should expose a function', function () {
+		expect(utils.buildGitProgressTitle).toBeDefined();
+	});
+
+	it.each([
+		['repoOne', ['repoOne'], 'repoOne'],
+		[
+			'multiple-repository-frontend',
+			['repoOne', 'multiple-repository-frontend', `teahupo'o-project`],
+			'multiple-repository-...',
+		],
+		[
+			'flut_base_web_blue_bank_core',
+			['repoOne', 'simple-demo', 'flut_base_web_blue_bank_core'],
+			'flut_base_web_blue_b...',
+		],
+	])(
+		'buildGitProgressTitle should return expected output when currentFolderName=%i and folderNameList=%i',
+		async function (
+			currentFolderName: string,
+			folderNameList: Array<string>,
+			currentFolderNameExpected: string
+		) {
+			const currentFolderIndex = folderNameList.indexOf(currentFolderName) + 1;
+			const progressTitle = utils.buildGitProgressTitle(
+				currentFolderName,
+				folderNameList
+			);
+			expect(progressTitle).toEqual(
+				`Running on ${currentFolderNameExpected} (${currentFolderIndex} of ${folderNameList.length})`
+			);
+		}
+	);
+});
+
 describe('showVscodeProgress', function () {
 	it('should expose a function', function () {
 		expect(utils.showVscodeProgress).toBeDefined();
 	});
 
 	it.each([
-		[22, 7, 32],
-		[22, 11, 50],
-		[22, 18, 82],
+		[22, 32],
+		[22, 50],
+		[22, 82],
 	])(
 		'showVscodeProgress should return expected output when progressStepsSize=%i and  progressDone=%i',
-		async function (
-			progressStepsSize: number,
-			progressDone: number,
-			progressExpected: number
-		) {
-			const progressMessageExpected = `Running ${progressDone} of ${progressStepsSize}`;
+		async function (progressStepsSize: number, progressExpected: number) {
+			const progressTitle = utils.buildGitProgressTitle('repoOne', ['repoOne']);
+			const progressMessageExpected = progressTitle;
 			const utilsSpy = { showVscodeProgress: utils.showVscodeProgress };
 			const showVscodeProgressSpy = jest.spyOn(utilsSpy, 'showVscodeProgress');
 			await vscode.window.withProgress(
 				{
 					title: 'Making merge... 🤘',
 				},
-				async function (progress) {
+				async function (progress: vscode.Progress<utils.ProgressData>) {
 					const result = (await utilsSpy.showVscodeProgress(
 						progressStepsSize,
-						progressDone,
+						progressTitle,
 						progress
 					)) as utils.ProgressData;
 

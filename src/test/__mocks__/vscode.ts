@@ -56,8 +56,12 @@ export const commands = {
 	executeCommand,
 };
 
-export const ProgressLocation = function () {
-	return {
-		Notification: {},
-	};
-};
+export enum ProgressLocation {
+	SourceControl = 1,
+	Window = 10,
+	Notification = 15,
+}
+
+export interface Progress<T> {
+	report(value: T): void;
+}

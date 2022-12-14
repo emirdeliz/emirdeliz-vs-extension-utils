@@ -1,5 +1,3 @@
-out
-dist
 coverage
 node_modules
 .vscode-test/
