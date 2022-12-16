@@ -11,7 +11,7 @@
 		"build:types": "tsc ./src/utils.ts --outDir dist --declaration --emitDeclarationOnly",
 		"build:dist": "rm -rf dist && swc ./src --quiet --out-dir dist && yarn build:types",
 		"test": "jest --clearCache && jest",
-		"test:watch": "jest --watch",
+		"test:watch": "jest --clearCache && jest --watch",
 		"lint:check": "eslint . --ext .ts --fix",
 		"clear:dependencies": "rm -rf node_modules && rm -rf yarn.lock",
 		"install:dev": "yarn clear:dependencies && yarn install"

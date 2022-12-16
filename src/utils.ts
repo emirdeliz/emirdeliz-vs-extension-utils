@@ -5,12 +5,19 @@ import {
 	EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME,
 	EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG,
 	EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS,
+	EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH,
 } from './constants';
 
 export interface ProgressData {
 	message?: string | undefined;
 	increment?: number | undefined;
 	incrementPercentageRounded?: number;
+}
+
+export interface CommandWithProgressNotification {
+	commandType: string;
+	processCommand: (currentFolder: string) => void;
+	foldersToCommandRun: Array<string>;
 }
 
 let nextTermId = 25041988;
@@ -31,7 +38,7 @@ function getVscodeTerminal() {
 	return terminalInstance;
 }
 
-function runCommandOnVsTerminal(command: string) {
+async function runCommandOnVsTerminal(command: string) {
 	try {
 		const terminal = getVscodeTerminal();
 		terminal.sendText(command);
@@ -111,24 +118,29 @@ function checkFolderHasGitConfig(folderPath: string) {
 	);
 }
 
-async function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
+export async function runCommandWithProgressNotification({
+	commandType,
+	processCommand,
+	foldersToCommandRun,
+}: CommandWithProgressNotification) {
 	return new Promise<void>(function (resolve) {
 		vscode.window.withProgress(
 			{
 				location: vscode.ProgressLocation.Notification,
-				title: 'Making pull... 🤘',
+				title: `Making ${commandType}... 🤘`,
 			},
-			async function (progress) {
-				for (const folder of foldersPathWithGitConfig) {
-					runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull, folder);
-					const progressTitle = buildGitProgressTitle(
-						folder,
-						foldersPathWithGitConfig
+			async function (vscodeProgressInstance) {
+				for (const currentFolder of foldersToCommandRun) {
+					const progressTitle = buildProgressTitle(
+						currentFolder,
+						foldersToCommandRun
 					);
+					processCommand(currentFolder);
+					const commandFoldersPathStackSize = foldersToCommandRun.length;
 					await showVscodeProgress(
-						foldersPathWithGitConfig.length,
+						commandFoldersPathStackSize,
 						progressTitle,
-						progress
+						vscodeProgressInstance
 					);
 				}
 				resolve();
@@ -137,29 +149,25 @@ async function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
 	});
 }
 
+async function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
+	const commandType = EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull;
+	return runCommandWithProgressNotification({
+		commandType,
+		foldersToCommandRun: foldersPathWithGitConfig,
+		processCommand: function (currentFolder: string) {
+			runGitCommand(commandType, currentFolder);
+		},
+	});
+}
+
 async function runGitMergeOnFolders(foldersPathWithGitConfig: Array<string>) {
-	return new Promise<void>(function (resolve) {
-		vscode.window.withProgress(
-			{
-				location: vscode.ProgressLocation.Notification,
-				title: 'Making merge... 🤘',
-			},
-			async function (progress) {
-				for (const folder of foldersPathWithGitConfig) {
-					runGitCommand(EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge, folder);
-					const progressTitle = buildGitProgressTitle(
-						folder,
-						foldersPathWithGitConfig
-					);
-					await showVscodeProgress(
-						foldersPathWithGitConfig.length,
-						progressTitle,
-						progress
-					);
-				}
-				resolve();
-			}
-		);
+	const commandType = EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge;
+	return runCommandWithProgressNotification({
+		commandType,
+		foldersToCommandRun: foldersPathWithGitConfig,
+		processCommand: function (currentFolder: string) {
+			runGitCommand(commandType, currentFolder);
+		},
 	});
 }
 
@@ -169,13 +177,13 @@ function getSettingsByKey(settingsExtensionKey: string, settingsKey: string) {
 	return settingValue as Array<string>;
 }
 
-export function buildGitProgressTitle(
+export function buildProgressTitle(
 	currentFolderName: string,
 	foldersName: Array<string>
 ) {
-	const folderNameTruncateLength = 20;
 	const folderNameReachedLimit =
-		currentFolderName.length > folderNameTruncateLength;
+		currentFolderName.length >
+		EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH;
 	const currentFolderIndex = foldersName.indexOf(currentFolderName) + 1;
 	return `Running on ${currentFolderName.substring(0, 20)}${
 		folderNameReachedLimit ? '...' : ''
@@ -200,7 +208,7 @@ function showVscodeProgress(
 					increment: incrementPercentageRounded,
 					message: progressTitle,
 				});
-				resolve({ progressTitle, incrementPercentageRounded });
+				resolve({ message: progressTitle, incrementPercentageRounded });
 			}, 1000);
 		});
 	} catch (e) {

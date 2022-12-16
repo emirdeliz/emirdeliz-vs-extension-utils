@@ -188,9 +188,9 @@ describe('getSettingsByKey', function () {
 	});
 });
 
-describe('buildGitProgressTitle', function () {
+describe('buildProgressTitle', function () {
 	it('should expose a function', function () {
-		expect(utils.buildGitProgressTitle).toBeDefined();
+		expect(utils.buildProgressTitle).toBeDefined();
 	});
 
 	it.each([
@@ -206,14 +206,14 @@ describe('buildGitProgressTitle', function () {
 			'flut_base_web_blue_b...',
 		],
 	])(
-		'buildGitProgressTitle should return expected output when currentFolderName=%i and folderNameList=%i',
+		'buildProgressTitle should return expected output when currentFolderName=%i and folderNameList=%i',
 		async function (
 			currentFolderName: string,
 			folderNameList: Array<string>,
 			currentFolderNameExpected: string
 		) {
 			const currentFolderIndex = folderNameList.indexOf(currentFolderName) + 1;
-			const progressTitle = utils.buildGitProgressTitle(
+			const progressTitle = utils.buildProgressTitle(
 				currentFolderName,
 				folderNameList
 			);
@@ -224,36 +224,93 @@ describe('buildGitProgressTitle', function () {
 	);
 });
 
+describe('runCommandWithProgressNotification', function () {
+	it('should expose a function', function () {
+		expect(utils.runCommandWithProgressNotification).toBeDefined();
+	});
+
+	const foldersToCommandRun = [
+		'project-cooperative',
+		'peter-project',
+		'flut_base_web_blue_bank_core',
+	];
+
+	it('should return expected output when running git pull', async function () {
+		const command = constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull;
+		const reportSpy = jest.spyOn(vscode.window, 'report');
+		const callbackObj = { callback: jest.fn() };
+		const callbackObjSpy = jest.spyOn(callbackObj, 'callback');
+
+		await utils.runCommandWithProgressNotification({
+			foldersToCommandRun,
+			commandType: command,
+			processCommand: callbackObj.callback,
+		});
+
+		expect(reportSpy).toBeCalledTimes(3);
+		expect(reportSpy).toHaveBeenNthCalledWith(1, {
+			increment: expect.closeTo(33),
+			message: `Running on ${foldersToCommandRun[0]} (1 of 3)`,
+		});
+
+		expect(reportSpy).toHaveBeenNthCalledWith(2, {
+			increment: expect.closeTo(33),
+			message: `Running on ${foldersToCommandRun[1]} (2 of 3)`,
+		});
+
+		expect(reportSpy).toHaveBeenNthCalledWith(3, {
+			increment: expect.closeTo(33),
+			message: `Running on ${foldersToCommandRun[2].substring(
+				0,
+				constants.EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH
+			)}... (3 of 3)`,
+		});
+
+		expect(callbackObjSpy).toBeCalledTimes(3);
+		expect(callbackObjSpy).toHaveBeenNthCalledWith(1, foldersToCommandRun[0]);
+		expect(callbackObjSpy).toHaveBeenNthCalledWith(2, foldersToCommandRun[1]);
+		expect(callbackObjSpy).toHaveBeenNthCalledWith(3, foldersToCommandRun[2]);
+	});
+});
+
 describe('showVscodeProgress', function () {
 	it('should expose a function', function () {
 		expect(utils.showVscodeProgress).toBeDefined();
 	});
 
 	it.each([
-		[22, 32],
-		[22, 50],
-		[22, 82],
+		[22, 5],
+		[17, 6],
+		[5, 20],
 	])(
-		'showVscodeProgress should return expected output when progressStepsSize=%i and  progressDone=%i',
+		'showVscodeProgress should return expected output when progressStepsSize=%s and  progressDone=%s',
 		async function (progressStepsSize: number, progressExpected: number) {
-			const progressTitle = utils.buildGitProgressTitle('repoOne', ['repoOne']);
-			const progressMessageExpected = progressTitle;
-			const utilsSpy = { showVscodeProgress: utils.showVscodeProgress };
-			const showVscodeProgressSpy = jest.spyOn(utilsSpy, 'showVscodeProgress');
-			await vscode.window.withProgress(
+			const progressTitle = utils.buildProgressTitle('repoOne', ['repoOne']);
+			const reportSpy = jest.spyOn(vscode.window, 'report');
+
+			jest.useFakeTimers();
+			// jest.spyOn(global, 'setTimeout');
+
+			vscode.window.withProgress(
 				{
 					title: 'Making merge... 🤘',
+					location: vscode.ProgressLocation.Notification,
 				},
-				async function (progress: vscode.Progress<utils.ProgressData>) {
-					const result = (await utilsSpy.showVscodeProgress(
+				async function (
+					vscodeProgressInstance: vscode.Progress<utils.ProgressData>
+				) {
+					await utils.showVscodeProgress(
 						progressStepsSize,
 						progressTitle,
-						progress
-					)) as utils.ProgressData;
+						vscodeProgressInstance
+					);
 
-					expect(showVscodeProgressSpy).toHaveBeenCalled();
-					expect(result?.message).toEqual(progressMessageExpected);
-					expect(result?.incrementPercentageRounded).toEqual(progressExpected);
+					jest.runAllTimers();
+					expect(reportSpy).toBeCalledTimes(3);
+					expect(reportSpy).toHaveBeenNthCalledWith(1, {
+						increment: expect.closeTo(progressExpected),
+						message: expect.any(expect.anything()),
+					});
 				}
 			);
 		}
