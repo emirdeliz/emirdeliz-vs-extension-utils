@@ -6,20 +6,35 @@ function _export(target, all) {
     });
 }
 _export(exports, {
-    buildGitProgressTitle: function() {
-        return buildGitProgressTitle;
+    runCommandWithProgressNotification: function() {
+        return runCommandWithProgressNotification;
+    },
+    buildProgressTitle: function() {
+        return buildProgressTitle;
     },
     createVscodeTerminal: function() {
         return createVscodeTerminal;
     },
-    getVscodeTerminal: function() {
-        return getVscodeTerminal;
+    checkFolderHasFolder: function() {
+        return checkFolderHasFolder;
+    },
+    checkFolderHasGitConfig: function() {
+        return checkFolderHasGitConfig;
     },
     runCommandOnVsTerminal: function() {
         return runCommandOnVsTerminal;
     },
     runGitCommand: function() {
         return runGitCommand;
+    },
+    runGitPullOnFolders: function() {
+        return runGitPullOnFolders;
+    },
+    runGitMergeOnFolders: function() {
+        return runGitMergeOnFolders;
+    },
+    getVscodeTerminal: function() {
+        return getVscodeTerminal;
     },
     getAllFoldersInDir: function() {
         return getAllFoldersInDir;
@@ -30,20 +45,8 @@ _export(exports, {
     getPathFolderFocus: function() {
         return getPathFolderFocus;
     },
-    checkFolderHasFolder: function() {
-        return checkFolderHasFolder;
-    },
     getWorkspacePath: function() {
         return getWorkspacePath;
-    },
-    checkFolderHasGitConfig: function() {
-        return checkFolderHasGitConfig;
-    },
-    runGitPullOnFolders: function() {
-        return runGitPullOnFolders;
-    },
-    runGitMergeOnFolders: function() {
-        return runGitMergeOnFolders;
     },
     getSettingsByKey: function() {
         return getSettingsByKey;
@@ -230,12 +233,24 @@ function getVscodeTerminal() {
     return terminalInstance;
 }
 function runCommandOnVsTerminal(command) {
-    try {
-        var terminal = getVscodeTerminal();
-        terminal.sendText(command);
-    } catch (e) {
-        _vscode.window.showErrorMessage("\uD83E\uDD75 An error occurred when executing the dart command: " + e);
-    }
+    return _runCommandOnVsTerminal.apply(this, arguments);
+}
+function _runCommandOnVsTerminal() {
+    _runCommandOnVsTerminal = _asyncToGenerator(function(command) {
+        var terminal;
+        return __generator(this, function(_state) {
+            try {
+                terminal = getVscodeTerminal();
+                terminal.sendText(command);
+            } catch (e) {
+                _vscode.window.showErrorMessage("\uD83E\uDD75 An error occurred when executing the dart command: " + e);
+            }
+            return [
+                2
+            ];
+        });
+    });
+    return _runCommandOnVsTerminal.apply(this, arguments);
 }
 function runGitCommand(command, workDir) {
     var commandWithMaybeWorkDir = "git " + (workDir ? "-C " + workDir + " " + command : "");
@@ -301,36 +316,39 @@ function getWorkspacePath() {
 function checkFolderHasGitConfig(folderPath) {
     return checkFolderHasFolder(folderPath, _constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG);
 }
-function runGitPullOnFolders(foldersPathWithGitConfig) {
-    return _runGitPullOnFolders.apply(this, arguments);
+function runCommandWithProgressNotification(_) {
+    return _runCommandWithProgressNotification.apply(this, arguments);
 }
-function _runGitPullOnFolders() {
-    _runGitPullOnFolders = _asyncToGenerator(function(foldersPathWithGitConfig) {
+function _runCommandWithProgressNotification() {
+    _runCommandWithProgressNotification = _asyncToGenerator(function(param) {
+        var commandType, processCommand, foldersToCommandRun;
         return __generator(this, function(_state) {
+            commandType = param.commandType, processCommand = param.processCommand, foldersToCommandRun = param.foldersToCommandRun;
             return [
                 2,
                 new Promise(function(resolve) {
                     _vscode.window.withProgress({
                         location: _vscode.ProgressLocation.Notification,
-                        title: "Making pull... \uD83E\uDD18"
-                    }, /*#__PURE__*/ _asyncToGenerator(function(progress) {
-                        var _iterator, _step, folder, progressTitle;
+                        title: "Making " + commandType + "... \uD83E\uDD18"
+                    }, /*#__PURE__*/ _asyncToGenerator(function(vscodeProgressInstance) {
+                        var _iterator, _step, currentFolder, progressTitle, commandFoldersPathStackSize;
                         return __generator(this, function(_state) {
                             switch(_state.label){
                                 case 0:
-                                    _iterator = _createForOfIteratorHelperLoose(foldersPathWithGitConfig);
+                                    _iterator = _createForOfIteratorHelperLoose(foldersToCommandRun);
                                     _state.label = 1;
                                 case 1:
                                     if (!!(_step = _iterator()).done) return [
                                         3,
                                         4
                                     ];
-                                    folder = _step.value;
-                                    runGitCommand(_constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull, folder);
-                                    progressTitle = buildGitProgressTitle(folder, foldersPathWithGitConfig);
+                                    currentFolder = _step.value;
+                                    progressTitle = buildProgressTitle(currentFolder, foldersToCommandRun);
+                                    processCommand(currentFolder);
+                                    commandFoldersPathStackSize = foldersToCommandRun.length;
                                     return [
                                         4,
-                                        showVscodeProgress(foldersPathWithGitConfig.length, progressTitle, progress)
+                                        showVscodeProgress(commandFoldersPathStackSize, progressTitle, vscodeProgressInstance)
                                     ];
                                 case 2:
                                     _state.sent();
@@ -348,6 +366,28 @@ function _runGitPullOnFolders() {
                             }
                         });
                     }));
+                })
+            ];
+        });
+    });
+    return _runCommandWithProgressNotification.apply(this, arguments);
+}
+function runGitPullOnFolders(foldersPathWithGitConfig) {
+    return _runGitPullOnFolders.apply(this, arguments);
+}
+function _runGitPullOnFolders() {
+    _runGitPullOnFolders = _asyncToGenerator(function(foldersPathWithGitConfig) {
+        var commandType;
+        return __generator(this, function(_state) {
+            commandType = _constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull;
+            return [
+                2,
+                runCommandWithProgressNotification({
+                    commandType: commandType,
+                    foldersToCommandRun: foldersPathWithGitConfig,
+                    processCommand: function processCommand(currentFolder) {
+                        runGitCommand(commandType, currentFolder);
+                    }
                 })
             ];
         });
@@ -359,48 +399,17 @@ function runGitMergeOnFolders(foldersPathWithGitConfig) {
 }
 function _runGitMergeOnFolders() {
     _runGitMergeOnFolders = _asyncToGenerator(function(foldersPathWithGitConfig) {
+        var commandType;
         return __generator(this, function(_state) {
+            commandType = _constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge;
             return [
                 2,
-                new Promise(function(resolve) {
-                    _vscode.window.withProgress({
-                        location: _vscode.ProgressLocation.Notification,
-                        title: "Making merge... \uD83E\uDD18"
-                    }, /*#__PURE__*/ _asyncToGenerator(function(progress) {
-                        var _iterator, _step, folder, progressTitle;
-                        return __generator(this, function(_state) {
-                            switch(_state.label){
-                                case 0:
-                                    _iterator = _createForOfIteratorHelperLoose(foldersPathWithGitConfig);
-                                    _state.label = 1;
-                                case 1:
-                                    if (!!(_step = _iterator()).done) return [
-                                        3,
-                                        4
-                                    ];
-                                    folder = _step.value;
-                                    runGitCommand(_constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge, folder);
-                                    progressTitle = buildGitProgressTitle(folder, foldersPathWithGitConfig);
-                                    return [
-                                        4,
-                                        showVscodeProgress(foldersPathWithGitConfig.length, progressTitle, progress)
-                                    ];
-                                case 2:
-                                    _state.sent();
-                                    _state.label = 3;
-                                case 3:
-                                    return [
-                                        3,
-                                        1
-                                    ];
-                                case 4:
-                                    resolve();
-                                    return [
-                                        2
-                                    ];
-                            }
-                        });
-                    }));
+                runCommandWithProgressNotification({
+                    commandType: commandType,
+                    foldersToCommandRun: foldersPathWithGitConfig,
+                    processCommand: function processCommand(currentFolder) {
+                        runGitCommand(commandType, currentFolder);
+                    }
                 })
             ];
         });
@@ -412,9 +421,8 @@ function getSettingsByKey(settingsExtensionKey, settingsKey) {
     var settingValue = settings == null ? void 0 : settings.get(settingsKey);
     return settingValue;
 }
-function buildGitProgressTitle(currentFolderName, foldersName) {
-    var folderNameTruncateLength = 20;
-    var folderNameReachedLimit = currentFolderName.length > folderNameTruncateLength;
+function buildProgressTitle(currentFolderName, foldersName) {
+    var folderNameReachedLimit = currentFolderName.length > _constants.EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH;
     var currentFolderIndex = foldersName.indexOf(currentFolderName) + 1;
     return "Running on " + currentFolderName.substring(0, 20) + (folderNameReachedLimit ? "..." : "") + " (" + currentFolderIndex + " of " + foldersName.length + ")";
 }
@@ -429,7 +437,7 @@ function showVscodeProgress(progressStepsSize, progressTitle, progress) {
                     message: progressTitle
                 });
                 resolve({
-                    progressTitle: progressTitle,
+                    message: progressTitle,
                     incrementPercentageRounded: incrementPercentageRounded
                 });
             }, 1000);

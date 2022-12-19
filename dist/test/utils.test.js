@@ -291,9 +291,9 @@ describe("getSettingsByKey", function() {
         expect(settingValue).toEqual("src/other-dir/code");
     });
 });
-describe("buildGitProgressTitle", function() {
+describe("buildProgressTitle", function() {
     it("should expose a function", function() {
-        expect(_utils.buildGitProgressTitle).toBeDefined();
+        expect(_utils.buildProgressTitle).toBeDefined();
     });
     it.each([
         [
@@ -321,15 +321,69 @@ describe("buildGitProgressTitle", function() {
             ],
             "flut_base_web_blue_b..."
         ]
-    ])("buildGitProgressTitle should return expected output when currentFolderName=%i and folderNameList=%i", /*#__PURE__*/ _asyncToGenerator(function(currentFolderName, folderNameList, currentFolderNameExpected) {
+    ])("buildProgressTitle should return expected output when currentFolderName=%i and folderNameList=%i", /*#__PURE__*/ _asyncToGenerator(function(currentFolderName, folderNameList, currentFolderNameExpected) {
         var currentFolderIndex, progressTitle;
         return __generator(this, function(_state) {
             currentFolderIndex = folderNameList.indexOf(currentFolderName) + 1;
-            progressTitle = _utils.buildGitProgressTitle(currentFolderName, folderNameList);
+            progressTitle = _utils.buildProgressTitle(currentFolderName, folderNameList);
             expect(progressTitle).toEqual("Running on " + currentFolderNameExpected + " (" + currentFolderIndex + " of " + folderNameList.length + ")");
             return [
                 2
             ];
+        });
+    }));
+});
+describe("runCommandWithProgressNotification", function() {
+    it("should expose a function", function() {
+        expect(_utils.runCommandWithProgressNotification).toBeDefined();
+    });
+    var foldersToCommandRun = [
+        "project-cooperative",
+        "peter-project",
+        "flut_base_web_blue_bank_core"
+    ];
+    it("should return expected output when running git pull", /*#__PURE__*/ _asyncToGenerator(function() {
+        var command, reportSpy, callbackObj, callbackObjSpy;
+        return __generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    command = _constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull;
+                    reportSpy = jest.spyOn(_vscode.window, "report");
+                    callbackObj = {
+                        callback: jest.fn()
+                    };
+                    callbackObjSpy = jest.spyOn(callbackObj, "callback");
+                    return [
+                        4,
+                        _utils.runCommandWithProgressNotification({
+                            foldersToCommandRun: foldersToCommandRun,
+                            commandType: command,
+                            processCommand: callbackObj.callback
+                        })
+                    ];
+                case 1:
+                    _state.sent();
+                    expect(reportSpy).toBeCalledTimes(3);
+                    expect(reportSpy).toHaveBeenNthCalledWith(1, {
+                        increment: expect.closeTo(33),
+                        message: "Running on " + foldersToCommandRun[0] + " (1 of 3)"
+                    });
+                    expect(reportSpy).toHaveBeenNthCalledWith(2, {
+                        increment: expect.closeTo(33),
+                        message: "Running on " + foldersToCommandRun[1] + " (2 of 3)"
+                    });
+                    expect(reportSpy).toHaveBeenNthCalledWith(3, {
+                        increment: expect.closeTo(33),
+                        message: "Running on " + foldersToCommandRun[2].substring(0, _constants.EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH) + "... (3 of 3)"
+                    });
+                    expect(callbackObjSpy).toBeCalledTimes(3);
+                    expect(callbackObjSpy).toHaveBeenNthCalledWith(1, foldersToCommandRun[0]);
+                    expect(callbackObjSpy).toHaveBeenNthCalledWith(2, foldersToCommandRun[1]);
+                    expect(callbackObjSpy).toHaveBeenNthCalledWith(3, foldersToCommandRun[2]);
+                    return [
+                        2
+                    ];
+            }
         });
     }));
 });
@@ -340,60 +394,53 @@ describe("showVscodeProgress", function() {
     it.each([
         [
             22,
-            32
+            5
         ],
         [
-            22,
-            50
+            17,
+            6
         ],
         [
-            22,
-            82
+            5,
+            20
         ]
-    ])("showVscodeProgress should return expected output when progressStepsSize=%i and  progressDone=%i", /*#__PURE__*/ _asyncToGenerator(function(progressStepsSize, progressExpected) {
-        var progressTitle, progressMessageExpected, utilsSpy, showVscodeProgressSpy;
+    ])("showVscodeProgress should return expected output when progressStepsSize=%s and  progressDone=%s", /*#__PURE__*/ _asyncToGenerator(function(progressStepsSize, progressExpected) {
+        var progressTitle, reportSpy;
         return __generator(this, function(_state) {
-            switch(_state.label){
-                case 0:
-                    progressTitle = _utils.buildGitProgressTitle("repoOne", [
-                        "repoOne"
-                    ]);
-                    progressMessageExpected = progressTitle;
-                    utilsSpy = {
-                        showVscodeProgress: _utils.showVscodeProgress
-                    };
-                    showVscodeProgressSpy = jest.spyOn(utilsSpy, "showVscodeProgress");
-                    return [
-                        4,
-                        _vscode.window.withProgress({
-                            title: "Making merge... \uD83E\uDD18"
-                        }, /*#__PURE__*/ _asyncToGenerator(function(progress) {
-                            var result;
-                            return __generator(this, function(_state) {
-                                switch(_state.label){
-                                    case 0:
-                                        return [
-                                            4,
-                                            utilsSpy.showVscodeProgress(progressStepsSize, progressTitle, progress)
-                                        ];
-                                    case 1:
-                                        result = _state.sent();
-                                        expect(showVscodeProgressSpy).toHaveBeenCalled();
-                                        expect(result == null ? void 0 : result.message).toEqual(progressMessageExpected);
-                                        expect(result == null ? void 0 : result.incrementPercentageRounded).toEqual(progressExpected);
-                                        return [
-                                            2
-                                        ];
-                                }
+            progressTitle = _utils.buildProgressTitle("repoOne", [
+                "repoOne"
+            ]);
+            reportSpy = jest.spyOn(_vscode.window, "report");
+            jest.useFakeTimers();
+            // jest.spyOn(global, 'setTimeout');
+            _vscode.window.withProgress({
+                title: "Making merge... \uD83E\uDD18",
+                location: _vscode.ProgressLocation.Notification
+            }, /*#__PURE__*/ _asyncToGenerator(function(vscodeProgressInstance) {
+                return __generator(this, function(_state) {
+                    switch(_state.label){
+                        case 0:
+                            return [
+                                4,
+                                _utils.showVscodeProgress(progressStepsSize, progressTitle, vscodeProgressInstance)
+                            ];
+                        case 1:
+                            _state.sent();
+                            jest.runAllTimers();
+                            expect(reportSpy).toBeCalledTimes(3);
+                            expect(reportSpy).toHaveBeenNthCalledWith(1, {
+                                increment: expect.closeTo(progressExpected),
+                                message: expect.any(expect.anything())
                             });
-                        }))
-                    ];
-                case 1:
-                    _state.sent();
-                    return [
-                        2
-                    ];
-            }
+                            return [
+                                2
+                            ];
+                    }
+                });
+            }));
+            return [
+                2
+            ];
         });
     }));
 });

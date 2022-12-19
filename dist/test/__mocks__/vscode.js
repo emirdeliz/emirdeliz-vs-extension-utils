@@ -24,14 +24,25 @@ _export(exports, {
 });
 var _constants = require("../../constants");
 var window = {
-    createTerminal: jest.fn(function() {
+    createTerminal: function createTerminal() {
         return {
-            name: "" + _constants.EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME + " #0000"
+            name: "" + _constants.EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME + " #0000",
+            sendText: function sendText(command) {
+                window.sendText(command);
+            }
         };
-    }),
+    },
     showErrorMessage: jest.fn(),
     showWarningMessage: jest.fn(),
-    withProgress: jest.fn()
+    withProgress: function withProgress(_progress, callback) {
+        callback({
+            report: window.report
+        });
+    },
+    sendText: jest.fn(),
+    report: function report() {
+        jest.fn();
+    }
 };
 var workspace = {
     getConfiguration: function getConfiguration() {
