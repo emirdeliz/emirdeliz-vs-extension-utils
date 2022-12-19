@@ -22,6 +22,7 @@ _export(exports, {
         return commands;
     }
 });
+var _fs = require("fs");
 var _constants = require("../../constants");
 var window = {
     createTerminal: function createTerminal() {
@@ -45,6 +46,17 @@ var window = {
     }
 };
 var workspace = {
+    findFiles: function findFiles(include) {
+        return Promise.resolve({
+            entries: function entries() {
+                return {
+                    next: function next() {
+                        return _fs.default.existsSync(include.toString());
+                    }
+                };
+            }
+        });
+    },
     getConfiguration: function getConfiguration() {
         return {
             get: jest.fn(function(settingKey) {
@@ -59,13 +71,13 @@ var workspace = {
             })
         };
     },
-    workspaceFolders: [
-        {
+    workspaceFolders: _fs.default.readdirSync(_constants.EMIRDELIZ_TEST_WORKSPACE_PATH).map(function(folder) {
+        return {
             uri: {
-                fsPath: _constants.EMIRDELIZ_TEST_WORKSPACE_PATH
+                fsPath: _constants.EMIRDELIZ_TEST_WORKSPACE_PATH + "/" + folder
             }
-        }
-    ]
+        };
+    })
 };
 var env = {
     clipboard: {

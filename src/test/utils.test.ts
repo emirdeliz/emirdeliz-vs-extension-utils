@@ -41,30 +41,13 @@ describe('runCommandOnVsTerminal', function () {
 	});
 });
 
-describe('getAllFoldersInDir', function () {
-	it('should expose a function', function () {
-		expect(utils.getAllFoldersInDir).toBeDefined();
-	});
-
-	it('getAllFoldersInDir should return expected output', function () {
-		const folders = utils.getAllFoldersInDir(
-			constants.EMIRDELIZ_TEST_WORKSPACE_PATH
-		);
-		expect(folders).toHaveLength(5);
-		expect(folders[0]).toEqual('data');
-		expect(folders[1]).toEqual('extension');
-		expect(folders[2]).toEqual('repoOne');
-	});
-});
-
 describe('getAllFoldersWithGitConfig', function () {
 	it('should expose a function', function () {
 		expect(utils.getAllFoldersWithGitConfig).toBeDefined();
 	});
 
-	it('getAllFoldersWithGitConfig should return expected output', function () {
-		const folders = utils.getAllFoldersWithGitConfig(
-			constants.EMIRDELIZ_TEST_WORKSPACE_PATH,
+	it('getAllFoldersWithGitConfig should return expected output', async function () {
+		const folders = await utils.getAllFoldersWithGitConfig(
 			constants.EMIRDELIZ_EXTENSION_UTILS_VSCODE_SETTINGS_PREFIX,
 			constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG
 		);
@@ -88,28 +71,18 @@ describe('checkFolderHasFolder', function () {
 		expect(utils.checkFolderHasFolder).toBeDefined();
 	});
 
-	it('checkFolderHasFolder should return expected output', function () {
-		let hasFolder = utils.checkFolderHasFolder(
-			'repoOne',
+	it('checkFolderHasFolder should return expected output', async function () {
+		let hasFolder = await utils.checkFolderHasFolder(
+			`${constants.EMIRDELIZ_TEST_WORKSPACE_PATH}/repoOne`,
 			constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG
 		);
 		expect(hasFolder).toBeTruthy();
 
-		hasFolder = utils.checkFolderHasFolder('repoTwo', 'core');
+		hasFolder = await utils.checkFolderHasFolder(
+			`${constants.EMIRDELIZ_TEST_WORKSPACE_PATH}/repoTwo`,
+			'core'
+		);
 		expect(hasFolder).toBeFalsy();
-	});
-});
-
-describe('getWorkspacePath', function () {
-	it('should expose a function', function () {
-		expect(utils.getWorkspacePath).toBeDefined();
-	});
-
-	it('getWorkspacePath should return expected output', function () {
-		const path = utils.getWorkspacePath();
-		expect(path).not.toBeUndefined();
-		expect(path.uri).not.toBeUndefined();
-		expect(path.uri.fsPath).toEqual(constants.EMIRDELIZ_TEST_WORKSPACE_PATH);
 	});
 });
 
@@ -118,11 +91,15 @@ describe('checkFolderHasGitConfig', function () {
 		expect(utils.checkFolderHasGitConfig).toBeDefined();
 	});
 
-	it('checkFolderHasGitConfig should return expected output', function () {
-		let hasConfig = utils.checkFolderHasGitConfig('repoTwo');
+	it('checkFolderHasGitConfig should return expected output', async function () {
+		let hasConfig = await utils.checkFolderHasGitConfig(
+			`${constants.EMIRDELIZ_TEST_WORKSPACE_PATH}/repoTwo`
+		);
 		expect(hasConfig).toBeTruthy();
 
-		hasConfig = utils.checkFolderHasGitConfig('swc');
+		hasConfig = await utils.checkFolderHasGitConfig(
+			`${constants.EMIRDELIZ_TEST_WORKSPACE_PATH}/swc`
+		);
 		expect(hasConfig).toBeFalsy();
 	});
 });
@@ -289,7 +266,6 @@ describe('showVscodeProgress', function () {
 			const reportSpy = jest.spyOn(vscode.window, 'report');
 
 			jest.useFakeTimers();
-			// jest.spyOn(global, 'setTimeout');
 
 			vscode.window.withProgress(
 				{

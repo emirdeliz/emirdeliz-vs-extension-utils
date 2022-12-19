@@ -56,33 +56,33 @@ function runGitCommand(command: string, workDir?: string) {
 	return runCommandOnVsTerminal(commandWithMaybeWorkDir);
 }
 
-function getAllFoldersInDir(folderPathBase: string) {
-	return fs.readdirSync(folderPathBase).filter(function (file) {
-		return fs.statSync(`${folderPathBase}/${file}`).isDirectory();
-	});
-}
-
-function getAllFoldersWithGitConfig(
-	folderPathBase: string,
+async function getAllFoldersWithGitConfig(
 	settingsKeyBase: string,
 	settingsKeyGitIgnoreFolder: string
 ) {
-	const foldersFromDir = getAllFoldersInDir(folderPathBase);
+	const workspaceFolders = vscode.workspace.workspaceFolders || [];
 	const ignoreFolders = getSettingsByKey(
 		settingsKeyBase,
 		settingsKeyGitIgnoreFolder
 	);
-	const workspaceFoldersWithoutIgnoreFolders = foldersFromDir.filter(function (
-		folder
-	) {
-		return !ignoreFolders || !ignoreFolders.includes(folder);
-	});
-	const foldersResult = workspaceFoldersWithoutIgnoreFolders.filter(function (
-		f
-	) {
-		return checkFolderHasGitConfig(f);
-	});
-	return foldersResult;
+
+	const workspaceFoldersWithoutIgnoreFolders = workspaceFolders.reduce(
+		function (result, folder) {
+			const isFolderToIgnore =
+				ignoreFolders && ignoreFolders.includes(folder.name);
+			return isFolderToIgnore ? result : [...result, folder];
+		},
+		[] as ReadonlyArray<vscode.WorkspaceFolder>
+	);
+
+	const workspaceFoldersResult = [] as Array<vscode.WorkspaceFolder>;
+	for (const folder of workspaceFoldersWithoutIgnoreFolders) {
+		const hasGitConfig = await checkFolderHasGitConfig(folder.uri.fsPath);
+		if (hasGitConfig) {
+			workspaceFoldersResult.push(folder);
+		}
+	}
+	return workspaceFoldersResult;
 }
 
 async function getPathFolderFocus() {
@@ -91,28 +91,18 @@ async function getPathFolderFocus() {
 	return folderPath;
 }
 
-function checkFolderHasFolder(
-	folderBasePath: string,
-	folderToBeFoundPath: string
+async function checkFolderHasFolder(
+	folderToBeFoundPath: string,
+	folderToBeFoundPattern: string
 ) {
-	const workspacePath = getWorkspacePath();
-	const workspaceDirBase = workspacePath?.uri?.fsPath;
-
-	return fs.existsSync(
-		path.join(workspaceDirBase, folderBasePath, folderToBeFoundPath)
+	const folders = await vscode.workspace.findFiles(
+		`${folderToBeFoundPath}/${folderToBeFoundPattern}`
 	);
+	return !!folders.entries().next();
 }
 
-function getWorkspacePath() {
-	const workspaceFolders = vscode.workspace.workspaceFolders;
-	const workspacePath = workspaceFolders
-		? workspaceFolders[0]
-		: ({} as vscode.WorkspaceFolder);
-	return workspacePath;
-}
-
-function checkFolderHasGitConfig(folderPath: string) {
-	return checkFolderHasFolder(
+async function checkFolderHasGitConfig(folderPath: string) {
+	return await checkFolderHasFolder(
 		folderPath,
 		EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG
 	);
@@ -229,10 +219,8 @@ export {
 	runGitPullOnFolders,
 	runGitMergeOnFolders,
 	getVscodeTerminal,
-	getAllFoldersInDir,
 	getAllFoldersWithGitConfig,
 	getPathFolderFocus,
-	getWorkspacePath,
 	getSettingsByKey,
 	showVscodeProgress,
 	isJestEnvironment,

@@ -36,17 +36,11 @@ _export(exports, {
     getVscodeTerminal: function() {
         return getVscodeTerminal;
     },
-    getAllFoldersInDir: function() {
-        return getAllFoldersInDir;
-    },
     getAllFoldersWithGitConfig: function() {
         return getAllFoldersWithGitConfig;
     },
     getPathFolderFocus: function() {
         return getPathFolderFocus;
-    },
-    getWorkspacePath: function() {
-        return getWorkspacePath;
     },
     getSettingsByKey: function() {
         return getSettingsByKey;
@@ -58,14 +52,15 @@ _export(exports, {
         return isJestEnvironment;
     }
 });
-var _fs = require("fs");
 var _vscode = require("vscode");
-var _path = require("path");
 var _constants = require("./constants");
 function _arrayLikeToArray(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
     for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
     return arr2;
+}
+function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) return _arrayLikeToArray(arr);
 }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
@@ -95,6 +90,15 @@ function _asyncToGenerator(fn) {
             _next(undefined);
         });
     };
+}
+function _iterableToArray(iter) {
+    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
+}
+function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
 }
 function _unsupportedIterableToArray(o, minLen) {
     if (!o) return;
@@ -256,21 +260,56 @@ function runGitCommand(command, workDir) {
     var commandWithMaybeWorkDir = "git " + (workDir ? "-C " + workDir + " " + command : "");
     return runCommandOnVsTerminal(commandWithMaybeWorkDir);
 }
-function getAllFoldersInDir(folderPathBase) {
-    return _fs.readdirSync(folderPathBase).filter(function(file) {
-        return _fs.statSync(folderPathBase + "/" + file).isDirectory();
-    });
+function getAllFoldersWithGitConfig(settingsKeyBase, settingsKeyGitIgnoreFolder) {
+    return _getAllFoldersWithGitConfig.apply(this, arguments);
 }
-function getAllFoldersWithGitConfig(folderPathBase, settingsKeyBase, settingsKeyGitIgnoreFolder) {
-    var foldersFromDir = getAllFoldersInDir(folderPathBase);
-    var ignoreFolders = getSettingsByKey(settingsKeyBase, settingsKeyGitIgnoreFolder);
-    var workspaceFoldersWithoutIgnoreFolders = foldersFromDir.filter(function(folder) {
-        return !ignoreFolders || !ignoreFolders.includes(folder);
+function _getAllFoldersWithGitConfig() {
+    _getAllFoldersWithGitConfig = _asyncToGenerator(function(settingsKeyBase, settingsKeyGitIgnoreFolder) {
+        var workspaceFolders, ignoreFolders, workspaceFoldersWithoutIgnoreFolders, workspaceFoldersResult, _iterator, _step, folder, hasGitConfig;
+        return __generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    workspaceFolders = _vscode.workspace.workspaceFolders || [];
+                    ignoreFolders = getSettingsByKey(settingsKeyBase, settingsKeyGitIgnoreFolder);
+                    workspaceFoldersWithoutIgnoreFolders = workspaceFolders.reduce(function(result, folder) {
+                        var isFolderToIgnore = ignoreFolders && ignoreFolders.includes(folder.name);
+                        return isFolderToIgnore ? result : _toConsumableArray(result).concat([
+                            folder
+                        ]);
+                    }, []);
+                    workspaceFoldersResult = [];
+                    _iterator = _createForOfIteratorHelperLoose(workspaceFoldersWithoutIgnoreFolders);
+                    _state.label = 1;
+                case 1:
+                    if (!!(_step = _iterator()).done) return [
+                        3,
+                        4
+                    ];
+                    folder = _step.value;
+                    return [
+                        4,
+                        checkFolderHasGitConfig(folder.uri.fsPath)
+                    ];
+                case 2:
+                    hasGitConfig = _state.sent();
+                    if (hasGitConfig) {
+                        workspaceFoldersResult.push(folder);
+                    }
+                    _state.label = 3;
+                case 3:
+                    return [
+                        3,
+                        1
+                    ];
+                case 4:
+                    return [
+                        2,
+                        workspaceFoldersResult
+                    ];
+            }
+        });
     });
-    var foldersResult = workspaceFoldersWithoutIgnoreFolders.filter(function(f) {
-        return checkFolderHasGitConfig(f);
-    });
-    return foldersResult;
+    return _getAllFoldersWithGitConfig.apply(this, arguments);
 }
 function getPathFolderFocus() {
     return _getPathFolderFocus.apply(this, arguments);
@@ -302,19 +341,51 @@ function _getPathFolderFocus() {
     });
     return _getPathFolderFocus.apply(this, arguments);
 }
-function checkFolderHasFolder(folderBasePath, folderToBeFoundPath) {
-    var _workspacePath_uri;
-    var workspacePath = getWorkspacePath();
-    var workspaceDirBase = workspacePath == null ? void 0 : (_workspacePath_uri = workspacePath.uri) == null ? void 0 : _workspacePath_uri.fsPath;
-    return _fs.existsSync(_path.join(workspaceDirBase, folderBasePath, folderToBeFoundPath));
+function checkFolderHasFolder(folderToBeFoundPath, folderToBeFoundPattern) {
+    return _checkFolderHasFolder.apply(this, arguments);
 }
-function getWorkspacePath() {
-    var workspaceFolders = _vscode.workspace.workspaceFolders;
-    var workspacePath = workspaceFolders ? workspaceFolders[0] : {};
-    return workspacePath;
+function _checkFolderHasFolder() {
+    _checkFolderHasFolder = _asyncToGenerator(function(folderToBeFoundPath, folderToBeFoundPattern) {
+        var folders;
+        return __generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    return [
+                        4,
+                        _vscode.workspace.findFiles(folderToBeFoundPath + "/" + folderToBeFoundPattern)
+                    ];
+                case 1:
+                    folders = _state.sent();
+                    return [
+                        2,
+                        !!folders.entries().next()
+                    ];
+            }
+        });
+    });
+    return _checkFolderHasFolder.apply(this, arguments);
 }
 function checkFolderHasGitConfig(folderPath) {
-    return checkFolderHasFolder(folderPath, _constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG);
+    return _checkFolderHasGitConfig.apply(this, arguments);
+}
+function _checkFolderHasGitConfig() {
+    _checkFolderHasGitConfig = _asyncToGenerator(function(folderPath) {
+        return __generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    return [
+                        4,
+                        checkFolderHasFolder(folderPath, _constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG)
+                    ];
+                case 1:
+                    return [
+                        2,
+                        _state.sent()
+                    ];
+            }
+        });
+    });
+    return _checkFolderHasGitConfig.apply(this, arguments);
 }
 function runCommandWithProgressNotification(_) {
     return _runCommandWithProgressNotification.apply(this, arguments);

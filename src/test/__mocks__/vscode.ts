@@ -1,4 +1,5 @@
-import { ProgressOptions } from 'vscode';
+import fs from 'fs';
+import * as vscode from 'vscode';
 import * as constants from '../../constants';
 
 export const window = {
@@ -13,7 +14,7 @@ export const window = {
 	showErrorMessage: jest.fn(),
 	showWarningMessage: jest.fn(),
 	withProgress: function (
-		_progress: ProgressOptions,
+		_progress: vscode.ProgressOptions,
 		callback: (
 			progress: Progress<{ message?: string; increment?: number }>
 		) => void
@@ -29,6 +30,17 @@ export const window = {
 };
 
 export const workspace = {
+	findFiles: function (include: vscode.GlobPattern) {
+		return Promise.resolve({
+			entries: function () {
+				return {
+					next: function () {
+						return fs.existsSync(include.toString());
+					},
+				};
+			},
+		});
+	},
 	getConfiguration: function () {
 		return {
 			get: jest.fn(function (settingKey: string) {
@@ -43,13 +55,15 @@ export const workspace = {
 			}),
 		};
 	},
-	workspaceFolders: [
-		{
-			uri: {
-				fsPath: constants.EMIRDELIZ_TEST_WORKSPACE_PATH,
-			},
-		},
-	],
+	workspaceFolders: fs
+		.readdirSync(constants.EMIRDELIZ_TEST_WORKSPACE_PATH)
+		.map(function (folder) {
+			return {
+				uri: {
+					fsPath: `${constants.EMIRDELIZ_TEST_WORKSPACE_PATH}/${folder}`,
+				},
+			};
+		}),
 };
 
 export const env = {

@@ -157,26 +157,28 @@ describe("runCommandOnVsTerminal", function() {
         expect(successfully).toBeTruthy();
     });
 });
-describe("getAllFoldersInDir", function() {
-    it("should expose a function", function() {
-        expect(_utils.getAllFoldersInDir).toBeDefined();
-    });
-    it("getAllFoldersInDir should return expected output", function() {
-        var folders = _utils.getAllFoldersInDir(_constants.EMIRDELIZ_TEST_WORKSPACE_PATH);
-        expect(folders).toHaveLength(5);
-        expect(folders[0]).toEqual("data");
-        expect(folders[1]).toEqual("extension");
-        expect(folders[2]).toEqual("repoOne");
-    });
-});
 describe("getAllFoldersWithGitConfig", function() {
     it("should expose a function", function() {
         expect(_utils.getAllFoldersWithGitConfig).toBeDefined();
     });
-    it("getAllFoldersWithGitConfig should return expected output", function() {
-        var folders = _utils.getAllFoldersWithGitConfig(_constants.EMIRDELIZ_TEST_WORKSPACE_PATH, _constants.EMIRDELIZ_EXTENSION_UTILS_VSCODE_SETTINGS_PREFIX, _constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG);
-        expect(folders).toHaveLength(2);
-    });
+    it("getAllFoldersWithGitConfig should return expected output", /*#__PURE__*/ _asyncToGenerator(function() {
+        var folders;
+        return __generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    return [
+                        4,
+                        _utils.getAllFoldersWithGitConfig(_constants.EMIRDELIZ_EXTENSION_UTILS_VSCODE_SETTINGS_PREFIX, _constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG)
+                    ];
+                case 1:
+                    folders = _state.sent();
+                    expect(folders).toHaveLength(2);
+                    return [
+                        2
+                    ];
+            }
+        });
+    }));
 });
 describe("getPathFolderFocus", function() {
     it("should expose a function", function() {
@@ -205,34 +207,61 @@ describe("checkFolderHasFolder", function() {
     it("should expose a function", function() {
         expect(_utils.checkFolderHasFolder).toBeDefined();
     });
-    it("checkFolderHasFolder should return expected output", function() {
-        var hasFolder = _utils.checkFolderHasFolder("repoOne", _constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG);
-        expect(hasFolder).toBeTruthy();
-        hasFolder = _utils.checkFolderHasFolder("repoTwo", "core");
-        expect(hasFolder).toBeFalsy();
-    });
-});
-describe("getWorkspacePath", function() {
-    it("should expose a function", function() {
-        expect(_utils.getWorkspacePath).toBeDefined();
-    });
-    it("getWorkspacePath should return expected output", function() {
-        var path = _utils.getWorkspacePath();
-        expect(path).not.toBeUndefined();
-        expect(path.uri).not.toBeUndefined();
-        expect(path.uri.fsPath).toEqual(_constants.EMIRDELIZ_TEST_WORKSPACE_PATH);
-    });
+    it("checkFolderHasFolder should return expected output", /*#__PURE__*/ _asyncToGenerator(function() {
+        var hasFolder;
+        return __generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    return [
+                        4,
+                        _utils.checkFolderHasFolder("" + _constants.EMIRDELIZ_TEST_WORKSPACE_PATH + "/repoOne", _constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG)
+                    ];
+                case 1:
+                    hasFolder = _state.sent();
+                    expect(hasFolder).toBeTruthy();
+                    return [
+                        4,
+                        _utils.checkFolderHasFolder("" + _constants.EMIRDELIZ_TEST_WORKSPACE_PATH + "/repoTwo", "core")
+                    ];
+                case 2:
+                    hasFolder = _state.sent();
+                    expect(hasFolder).toBeFalsy();
+                    return [
+                        2
+                    ];
+            }
+        });
+    }));
 });
 describe("checkFolderHasGitConfig", function() {
     it("should expose a function", function() {
         expect(_utils.checkFolderHasGitConfig).toBeDefined();
     });
-    it("checkFolderHasGitConfig should return expected output", function() {
-        var hasConfig = _utils.checkFolderHasGitConfig("repoTwo");
-        expect(hasConfig).toBeTruthy();
-        hasConfig = _utils.checkFolderHasGitConfig("swc");
-        expect(hasConfig).toBeFalsy();
-    });
+    it("checkFolderHasGitConfig should return expected output", /*#__PURE__*/ _asyncToGenerator(function() {
+        var hasConfig;
+        return __generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    return [
+                        4,
+                        _utils.checkFolderHasGitConfig("" + _constants.EMIRDELIZ_TEST_WORKSPACE_PATH + "/repoTwo")
+                    ];
+                case 1:
+                    hasConfig = _state.sent();
+                    expect(hasConfig).toBeTruthy();
+                    return [
+                        4,
+                        _utils.checkFolderHasGitConfig("" + _constants.EMIRDELIZ_TEST_WORKSPACE_PATH + "/swc")
+                    ];
+                case 2:
+                    hasConfig = _state.sent();
+                    expect(hasConfig).toBeFalsy();
+                    return [
+                        2
+                    ];
+            }
+        });
+    }));
 });
 describe("runGitPullOnFolders", function() {
     it("should expose a function", function() {
@@ -412,7 +441,6 @@ describe("showVscodeProgress", function() {
             ]);
             reportSpy = jest.spyOn(_vscode.window, "report");
             jest.useFakeTimers();
-            // jest.spyOn(global, 'setTimeout');
             _vscode.window.withProgress({
                 title: "Making merge... \uD83E\uDD18",
                 location: _vscode.ProgressLocation.Notification
