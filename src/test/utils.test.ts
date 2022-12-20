@@ -115,7 +115,10 @@ describe('runGitPullOnFolders', function () {
 		const runGitPullOnFoldersSpy = jest.spyOn(utilsSpy, 'runGitPullOnFolders');
 
 		try {
-			const foldersPathWithGitConfig = ['repoOne', 'repoTwo'];
+			const foldersPathWithGitConfig = [
+				{ name: 'repoOne' },
+				{ name: 'repoTwo' },
+			] as Array<vscode.WorkspaceFolder>;
 			utilsSpy.runGitPullOnFolders(foldersPathWithGitConfig);
 			successfully = true;
 		} catch (e) {
@@ -140,7 +143,10 @@ describe('runGitMergeOnFolders', function () {
 		);
 
 		try {
-			const foldersPathWithGitConfig = ['repoOne', 'repoTwo'];
+			const foldersPathWithGitConfig = [
+				{ name: 'repoOne' },
+				{ name: 'repoTwo' },
+			] as Array<vscode.WorkspaceFolder>;
 			utilsSpy.runGitMergeOnFolders(foldersPathWithGitConfig);
 			successfully = true;
 		} catch (e) {
@@ -171,27 +177,39 @@ describe('buildProgressTitle', function () {
 	});
 
 	it.each([
-		['repoOne', ['repoOne'], 'repoOne'],
 		[
-			'multiple-repository-frontend',
-			['repoOne', 'multiple-repository-frontend', `teahupo'o-project`],
+			{ name: 'repoOne' } as vscode.WorkspaceFolder,
+			[{ name: 'repoOne' }] as Array<vscode.WorkspaceFolder>,
+			'repoOne',
+		],
+		[
+			{ name: 'multiple-repository-frontend' } as vscode.WorkspaceFolder,
+			[
+				{ name: 'repoOne' },
+				{ name: 'multiple-repository-frontend' },
+				{ name: `teahupo'o-project` },
+			] as Array<vscode.WorkspaceFolder>,
 			'multiple-repository-...',
 		],
 		[
-			'flut_base_web_blue_bank_core',
-			['repoOne', 'simple-demo', 'flut_base_web_blue_bank_core'],
+			{ name: 'flut_base_web_blue_bank_core' } as vscode.WorkspaceFolder,
+			[
+				{ name: 'repoOne' },
+				{ name: 'simple-demo' },
+				{ name: 'flut_base_web_blue_bank_core' },
+			] as Array<vscode.WorkspaceFolder>,
 			'flut_base_web_blue_b...',
 		],
 	])(
 		'buildProgressTitle should return expected output when currentFolderName=%i and folderNameList=%i',
 		async function (
-			currentFolderName: string,
-			folderNameList: Array<string>,
+			currentFolder: vscode.WorkspaceFolder,
+			folderNameList: Array<vscode.WorkspaceFolder>,
 			currentFolderNameExpected: string
 		) {
-			const currentFolderIndex = folderNameList.indexOf(currentFolderName) + 1;
+			const currentFolderIndex = folderNameList.indexOf(currentFolder) + 1;
 			const progressTitle = utils.buildProgressTitle(
-				currentFolderName,
+				currentFolder,
 				folderNameList
 			);
 			expect(progressTitle).toEqual(
@@ -207,10 +225,10 @@ describe('runCommandWithProgressNotification', function () {
 	});
 
 	const foldersToCommandRun = [
-		'project-cooperative',
-		'peter-project',
-		'flut_base_web_blue_bank_core',
-	];
+		{ name: 'project-cooperative' },
+		{ name: 'peter-project' },
+		{ name: 'flut_base_web_blue_bank_core' },
+	] as Array<vscode.WorkspaceFolder>;
 
 	it('should return expected output when running git pull', async function () {
 		const command = constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull;
@@ -227,17 +245,17 @@ describe('runCommandWithProgressNotification', function () {
 		expect(reportSpy).toBeCalledTimes(3);
 		expect(reportSpy).toHaveBeenNthCalledWith(1, {
 			increment: expect.closeTo(33),
-			message: `Running on ${foldersToCommandRun[0]} (1 of 3)`,
+			message: `Running on ${foldersToCommandRun[0].name} (1 of 3)`,
 		});
 
 		expect(reportSpy).toHaveBeenNthCalledWith(2, {
 			increment: expect.closeTo(33),
-			message: `Running on ${foldersToCommandRun[1]} (2 of 3)`,
+			message: `Running on ${foldersToCommandRun[1].name} (2 of 3)`,
 		});
 
 		expect(reportSpy).toHaveBeenNthCalledWith(3, {
 			increment: expect.closeTo(33),
-			message: `Running on ${foldersToCommandRun[2].substring(
+			message: `Running on ${foldersToCommandRun[2].name?.substring(
 				0,
 				constants.EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH
 			)}... (3 of 3)`,
@@ -262,9 +280,11 @@ describe('showVscodeProgress', function () {
 	])(
 		'showVscodeProgress should return expected output when progressStepsSize=%s and  progressDone=%s',
 		async function (progressStepsSize: number, progressExpected: number) {
-			const progressTitle = utils.buildProgressTitle('repoOne', ['repoOne']);
+			const progressTitle = utils.buildProgressTitle(
+				{ name: 'repoOne' } as vscode.WorkspaceFolder,
+				[{ name: 'repoOne' }] as Array<vscode.WorkspaceFolder>
+			);
 			const reportSpy = jest.spyOn(vscode.window, 'report');
-
 			jest.useFakeTimers();
 
 			vscode.window.withProgress(

@@ -257,7 +257,7 @@ function _runCommandOnVsTerminal() {
     return _runCommandOnVsTerminal.apply(this, arguments);
 }
 function runGitCommand(command, workDir) {
-    var commandWithMaybeWorkDir = "git " + (workDir ? "-C " + workDir + " " + command : "");
+    var commandWithMaybeWorkDir = "git " + (workDir ? "-C " + workDir.name + " " + command : "");
     return runCommandOnVsTerminal(commandWithMaybeWorkDir);
 }
 function getAllFoldersWithGitConfig(settingsKeyBase, settingsKeyGitIgnoreFolder) {
@@ -492,10 +492,11 @@ function getSettingsByKey(settingsExtensionKey, settingsKey) {
     var settingValue = settings == null ? void 0 : settings.get(settingsKey);
     return settingValue;
 }
-function buildProgressTitle(currentFolderName, foldersName) {
-    var folderNameReachedLimit = currentFolderName.length > _constants.EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH;
-    var currentFolderIndex = foldersName.indexOf(currentFolderName) + 1;
-    return "Running on " + currentFolderName.substring(0, 20) + (folderNameReachedLimit ? "..." : "") + " (" + currentFolderIndex + " of " + foldersName.length + ")";
+function buildProgressTitle(currentFolderName, workspaceFolders) {
+    var _currentFolderName_name, _currentFolderName_name1;
+    var folderNameReachedLimit = ((_currentFolderName_name = currentFolderName.name) == null ? void 0 : _currentFolderName_name.length) > _constants.EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH;
+    var currentFolderIndex = workspaceFolders.indexOf(currentFolderName) + 1;
+    return "Running on " + ((_currentFolderName_name1 = currentFolderName.name) == null ? void 0 : _currentFolderName_name1.substring(0, 20)) + (folderNameReachedLimit ? "..." : "") + " (" + currentFolderIndex + " of " + workspaceFolders.length + ")";
 }
 function showVscodeProgress(progressStepsSize, progressTitle, progress) {
     try {

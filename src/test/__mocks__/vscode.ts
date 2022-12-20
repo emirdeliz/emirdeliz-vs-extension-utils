@@ -29,6 +29,12 @@ export const window = {
 	},
 };
 
+export interface WorkspaceFolder {
+	readonly uri: vscode.Uri;
+	readonly name: string;
+	readonly index: number;
+}
+
 export const workspace = {
 	findFiles: function (include: vscode.GlobPattern) {
 		return Promise.resolve({

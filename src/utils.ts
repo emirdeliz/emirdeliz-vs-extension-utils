@@ -16,8 +16,8 @@ export interface ProgressData {
 
 export interface CommandWithProgressNotification {
 	commandType: string;
-	processCommand: (currentFolder: string) => void;
-	foldersToCommandRun: Array<string>;
+	processCommand: (currentFolder: vscode.WorkspaceFolder) => void;
+	foldersToCommandRun: Array<vscode.WorkspaceFolder>;
 }
 
 let nextTermId = 25041988;
@@ -49,9 +49,9 @@ async function runCommandOnVsTerminal(command: string) {
 	}
 }
 
-function runGitCommand(command: string, workDir?: string) {
+function runGitCommand(command: string, workDir?: vscode.WorkspaceFolder) {
 	const commandWithMaybeWorkDir = `git ${
-		workDir ? `-C ${workDir} ${command}` : ''
+		workDir ? `-C ${workDir.name} ${command}` : ''
 	}`;
 	return runCommandOnVsTerminal(commandWithMaybeWorkDir);
 }
@@ -139,23 +139,27 @@ export async function runCommandWithProgressNotification({
 	});
 }
 
-async function runGitPullOnFolders(foldersPathWithGitConfig: Array<string>) {
+async function runGitPullOnFolders(
+	foldersPathWithGitConfig: Array<vscode.WorkspaceFolder>
+) {
 	const commandType = EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull;
 	return runCommandWithProgressNotification({
 		commandType,
 		foldersToCommandRun: foldersPathWithGitConfig,
-		processCommand: function (currentFolder: string) {
+		processCommand: function (currentFolder: vscode.WorkspaceFolder) {
 			runGitCommand(commandType, currentFolder);
 		},
 	});
 }
 
-async function runGitMergeOnFolders(foldersPathWithGitConfig: Array<string>) {
+async function runGitMergeOnFolders(
+	foldersPathWithGitConfig: Array<vscode.WorkspaceFolder>
+) {
 	const commandType = EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge;
 	return runCommandWithProgressNotification({
 		commandType,
 		foldersToCommandRun: foldersPathWithGitConfig,
-		processCommand: function (currentFolder: string) {
+		processCommand: function (currentFolder: vscode.WorkspaceFolder) {
 			runGitCommand(commandType, currentFolder);
 		},
 	});
@@ -168,16 +172,16 @@ function getSettingsByKey(settingsExtensionKey: string, settingsKey: string) {
 }
 
 export function buildProgressTitle(
-	currentFolderName: string,
-	foldersName: Array<string>
+	currentFolderName: vscode.WorkspaceFolder,
+	workspaceFolders: Array<vscode.WorkspaceFolder>
 ) {
 	const folderNameReachedLimit =
-		currentFolderName.length >
+		currentFolderName.name?.length >
 		EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH;
-	const currentFolderIndex = foldersName.indexOf(currentFolderName) + 1;
-	return `Running on ${currentFolderName.substring(0, 20)}${
+	const currentFolderIndex = workspaceFolders.indexOf(currentFolderName) + 1;
+	return `Running on ${currentFolderName.name?.substring(0, 20)}${
 		folderNameReachedLimit ? '...' : ''
-	} (${currentFolderIndex} of ${foldersName.length})`;
+	} (${currentFolderIndex} of ${workspaceFolders.length})`;
 }
 
 function showVscodeProgress(

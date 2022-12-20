@@ -275,8 +275,12 @@ describe("runGitPullOnFolders", function() {
         var runGitPullOnFoldersSpy = jest.spyOn(utilsSpy, "runGitPullOnFolders");
         try {
             var foldersPathWithGitConfig = [
-                "repoOne",
-                "repoTwo"
+                {
+                    name: "repoOne"
+                },
+                {
+                    name: "repoTwo"
+                }
             ];
             utilsSpy.runGitPullOnFolders(foldersPathWithGitConfig);
             successfully = true;
@@ -299,8 +303,12 @@ describe("runGitMergeOnFolders", function() {
         var runGitMergeOnFoldersSpy = jest.spyOn(utilsSpy, "runGitMergeOnFolders");
         try {
             var foldersPathWithGitConfig = [
-                "repoOne",
-                "repoTwo"
+                {
+                    name: "repoOne"
+                },
+                {
+                    name: "repoTwo"
+                }
             ];
             utilsSpy.runGitMergeOnFolders(foldersPathWithGitConfig);
             successfully = true;
@@ -326,35 +334,55 @@ describe("buildProgressTitle", function() {
     });
     it.each([
         [
-            "repoOne",
+            {
+                name: "repoOne"
+            },
             [
-                "repoOne"
+                {
+                    name: "repoOne"
+                }
             ],
             "repoOne"
         ],
         [
-            "multiple-repository-frontend",
+            {
+                name: "multiple-repository-frontend"
+            },
             [
-                "repoOne",
-                "multiple-repository-frontend",
-                "teahupo'o-project"
+                {
+                    name: "repoOne"
+                },
+                {
+                    name: "multiple-repository-frontend"
+                },
+                {
+                    name: "teahupo'o-project"
+                }
             ],
             "multiple-repository-..."
         ],
         [
-            "flut_base_web_blue_bank_core",
+            {
+                name: "flut_base_web_blue_bank_core"
+            },
             [
-                "repoOne",
-                "simple-demo",
-                "flut_base_web_blue_bank_core"
+                {
+                    name: "repoOne"
+                },
+                {
+                    name: "simple-demo"
+                },
+                {
+                    name: "flut_base_web_blue_bank_core"
+                }
             ],
             "flut_base_web_blue_b..."
         ]
-    ])("buildProgressTitle should return expected output when currentFolderName=%i and folderNameList=%i", /*#__PURE__*/ _asyncToGenerator(function(currentFolderName, folderNameList, currentFolderNameExpected) {
+    ])("buildProgressTitle should return expected output when currentFolderName=%i and folderNameList=%i", /*#__PURE__*/ _asyncToGenerator(function(currentFolder, folderNameList, currentFolderNameExpected) {
         var currentFolderIndex, progressTitle;
         return __generator(this, function(_state) {
-            currentFolderIndex = folderNameList.indexOf(currentFolderName) + 1;
-            progressTitle = _utils.buildProgressTitle(currentFolderName, folderNameList);
+            currentFolderIndex = folderNameList.indexOf(currentFolder) + 1;
+            progressTitle = _utils.buildProgressTitle(currentFolder, folderNameList);
             expect(progressTitle).toEqual("Running on " + currentFolderNameExpected + " (" + currentFolderIndex + " of " + folderNameList.length + ")");
             return [
                 2
@@ -367,12 +395,18 @@ describe("runCommandWithProgressNotification", function() {
         expect(_utils.runCommandWithProgressNotification).toBeDefined();
     });
     var foldersToCommandRun = [
-        "project-cooperative",
-        "peter-project",
-        "flut_base_web_blue_bank_core"
+        {
+            name: "project-cooperative"
+        },
+        {
+            name: "peter-project"
+        },
+        {
+            name: "flut_base_web_blue_bank_core"
+        }
     ];
     it("should return expected output when running git pull", /*#__PURE__*/ _asyncToGenerator(function() {
-        var command, reportSpy, callbackObj, callbackObjSpy;
+        var _foldersToCommandRun__name, command, reportSpy, callbackObj, callbackObjSpy;
         return __generator(this, function(_state) {
             switch(_state.label){
                 case 0:
@@ -395,15 +429,15 @@ describe("runCommandWithProgressNotification", function() {
                     expect(reportSpy).toBeCalledTimes(3);
                     expect(reportSpy).toHaveBeenNthCalledWith(1, {
                         increment: expect.closeTo(33),
-                        message: "Running on " + foldersToCommandRun[0] + " (1 of 3)"
+                        message: "Running on " + foldersToCommandRun[0].name + " (1 of 3)"
                     });
                     expect(reportSpy).toHaveBeenNthCalledWith(2, {
                         increment: expect.closeTo(33),
-                        message: "Running on " + foldersToCommandRun[1] + " (2 of 3)"
+                        message: "Running on " + foldersToCommandRun[1].name + " (2 of 3)"
                     });
                     expect(reportSpy).toHaveBeenNthCalledWith(3, {
                         increment: expect.closeTo(33),
-                        message: "Running on " + foldersToCommandRun[2].substring(0, _constants.EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH) + "... (3 of 3)"
+                        message: "Running on " + ((_foldersToCommandRun__name = foldersToCommandRun[2].name) == null ? void 0 : _foldersToCommandRun__name.substring(0, _constants.EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH)) + "... (3 of 3)"
                     });
                     expect(callbackObjSpy).toBeCalledTimes(3);
                     expect(callbackObjSpy).toHaveBeenNthCalledWith(1, foldersToCommandRun[0]);
@@ -436,8 +470,12 @@ describe("showVscodeProgress", function() {
     ])("showVscodeProgress should return expected output when progressStepsSize=%s and  progressDone=%s", /*#__PURE__*/ _asyncToGenerator(function(progressStepsSize, progressExpected) {
         var progressTitle, reportSpy;
         return __generator(this, function(_state) {
-            progressTitle = _utils.buildProgressTitle("repoOne", [
-                "repoOne"
+            progressTitle = _utils.buildProgressTitle({
+                name: "repoOne"
+            }, [
+                {
+                    name: "repoOne"
+                }
             ]);
             reportSpy = jest.spyOn(_vscode.window, "report");
             jest.useFakeTimers();
