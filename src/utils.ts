@@ -1,12 +1,7 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as path from 'path';
-import {
-	EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME,
-	EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG,
-	EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS,
-	EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH,
-} from './constants';
+import * as constants from './constants';
 
 export interface ProgressData {
 	message?: string | undefined;
@@ -25,7 +20,9 @@ let terminalInstance = {} as vscode.Terminal;
 
 function createVscodeTerminal() {
 	terminalInstance = vscode.window.createTerminal({
-		name: `${EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME} #${nextTermId++}`,
+		name: `${
+			constants.EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME
+		} #${nextTermId++}`,
 		hideFromUser: true,
 	});
 	return terminalInstance;
@@ -92,7 +89,7 @@ async function getAllFoldersWithGitConfig(
 	settingsKeyGitIgnoreFolder: string
 ) {
 	const workspaceFolders = getWorkspaceFolders();
-	const ignoreFolders = getSettingsByKey(
+	const ignoreFolders = getSettingsByKey<Array<string>>(
 		settingsKeyBase,
 		settingsKeyGitIgnoreFolder
 	);
@@ -135,7 +132,7 @@ async function checkFolderHasFolder(
 async function checkFolderHasGitConfig(folderPath: string) {
 	return await checkFolderHasFolder(
 		folderPath,
-		EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG
+		constants.EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG
 	);
 }
 
@@ -178,7 +175,7 @@ export async function runCommandWithProgressNotification({
 async function runGitPullOnFolders(
 	foldersPathWithGitConfig: Array<vscode.WorkspaceFolder>
 ) {
-	const commandType = EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull;
+	const commandType = constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Pull;
 	return runCommandWithProgressNotification({
 		commandType,
 		foldersToCommandRun: foldersPathWithGitConfig,
@@ -189,22 +186,27 @@ async function runGitPullOnFolders(
 }
 
 async function runGitMergeOnFolders(
-	foldersPathWithGitConfig: Array<vscode.WorkspaceFolder>
+	foldersPathWithGitConfig: Array<vscode.WorkspaceFolder>,
+	branchOrigin: string
 ) {
-	const commandType = EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge;
+	const commandType = constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge;
+	const command = `${commandType} origin/${branchOrigin}`;
 	return runCommandWithProgressNotification({
 		commandType,
 		foldersToCommandRun: foldersPathWithGitConfig,
 		processCommand: function (currentFolder: vscode.WorkspaceFolder) {
-			runGitCommand(commandType, currentFolder);
+			runGitCommand(command, currentFolder);
 		},
 	});
 }
 
-function getSettingsByKey(settingsExtensionKey: string, settingsKey: string) {
+function getSettingsByKey<T>(
+	settingsExtensionKey: string,
+	settingsKey: string
+) {
 	const settings = vscode.workspace.getConfiguration(settingsExtensionKey);
 	const settingValue = settings?.get(settingsKey);
-	return settingValue as Array<string>;
+	return settingValue as T;
 }
 
 export function buildProgressTitle(
@@ -213,7 +215,7 @@ export function buildProgressTitle(
 ) {
 	const folderNameReachedLimit =
 		currentFolderName.name?.length >
-		EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH;
+		constants.EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH;
 	const currentFolderIndex = workspaceFolders.indexOf(currentFolderName) + 1;
 	return `Running on ${currentFolderName.name?.substring(0, 20)}${
 		folderNameReachedLimit ? '...' : ''

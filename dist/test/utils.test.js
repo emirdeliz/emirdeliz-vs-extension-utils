@@ -337,57 +337,72 @@ describe("runGitPullOnFolders", function() {
     it("should expose a function", function() {
         expect(_utils.runGitPullOnFolders).toBeDefined();
     });
-    it("runGitPullOnFolders should return expected output", function() {
-        var successfully = false;
-        var utilsSpy = {
-            runGitPullOnFolders: _utils.runGitPullOnFolders
-        };
-        var runGitPullOnFoldersSpy = jest.spyOn(utilsSpy, "runGitPullOnFolders");
-        try {
-            var foldersPathWithGitConfig = [
-                {
-                    name: "repoOne"
-                },
-                {
-                    name: "repoTwo"
-                }
-            ];
-            utilsSpy.runGitPullOnFolders(foldersPathWithGitConfig);
-            successfully = true;
-        } catch (e) {
-            successfully = false;
-        }
-        expect(runGitPullOnFoldersSpy).toHaveBeenCalled();
-        expect(successfully).toBeTruthy();
-    });
+    it("runGitPullOnFolders should return expected output", /*#__PURE__*/ _asyncToGenerator(function() {
+        var runSpy, foldersPathWithGitConfig;
+        return __generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    runSpy = jest.spyOn(_vscode.window, "sendText");
+                    runSpy.mockClear();
+                    foldersPathWithGitConfig = [
+                        {
+                            name: "repoOne"
+                        },
+                        {
+                            name: "repoTwo"
+                        }
+                    ];
+                    return [
+                        4,
+                        _utils.runGitPullOnFolders(foldersPathWithGitConfig)
+                    ];
+                case 1:
+                    _state.sent();
+                    expect(runSpy).toHaveBeenCalledTimes(2);
+                    expect(runSpy).toHaveBeenNthCalledWith(1, "git -C repoOne pull");
+                    expect(runSpy).toHaveBeenNthCalledWith(2, "git -C repoTwo pull");
+                    return [
+                        2
+                    ];
+            }
+        });
+    }));
 });
 describe("runGitMergeOnFolders", function() {
     it("should expose a function", function() {
         expect(_utils.runGitMergeOnFolders).toBeDefined();
     });
-    it("runGitMergeOnFolders should return expected output", function() {
-        var successfully = false;
-        var utilsSpy = {
-            runGitMergeOnFolders: _utils.runGitMergeOnFolders
-        };
-        var runGitMergeOnFoldersSpy = jest.spyOn(utilsSpy, "runGitMergeOnFolders");
-        try {
-            var foldersPathWithGitConfig = [
-                {
-                    name: "repoOne"
-                },
-                {
-                    name: "repoTwo"
-                }
-            ];
-            utilsSpy.runGitMergeOnFolders(foldersPathWithGitConfig);
-            successfully = true;
-        } catch (e) {
-            successfully = false;
-        }
-        expect(runGitMergeOnFoldersSpy).toHaveBeenCalled();
-        expect(successfully).toBeTruthy();
-    });
+    it("runGitMergeOnFolders should return expected output", /*#__PURE__*/ _asyncToGenerator(function() {
+        var runSpy, branchOrigin, foldersPathWithGitConfig;
+        return __generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    runSpy = jest.spyOn(_vscode.window, "sendText");
+                    runSpy.mockClear();
+                    branchOrigin = "feature/login";
+                    foldersPathWithGitConfig = [
+                        {
+                            name: "repoOne"
+                        },
+                        {
+                            name: "repoTwo"
+                        }
+                    ];
+                    return [
+                        4,
+                        _utils.runGitMergeOnFolders(foldersPathWithGitConfig, branchOrigin)
+                    ];
+                case 1:
+                    _state.sent();
+                    expect(runSpy).toHaveBeenCalledTimes(2);
+                    expect(runSpy).toHaveBeenNthCalledWith(1, "git -C repoOne merge origin/" + branchOrigin);
+                    expect(runSpy).toHaveBeenNthCalledWith(2, "git -C repoTwo merge origin/" + branchOrigin);
+                    return [
+                        2
+                    ];
+            }
+        });
+    }));
 });
 describe("getSettingsByKey", function() {
     it("should expose a function", function() {

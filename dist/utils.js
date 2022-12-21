@@ -503,21 +503,22 @@ function _runGitPullOnFolders() {
     });
     return _runGitPullOnFolders.apply(this, arguments);
 }
-function runGitMergeOnFolders(foldersPathWithGitConfig) {
+function runGitMergeOnFolders(foldersPathWithGitConfig, branchOrigin) {
     return _runGitMergeOnFolders.apply(this, arguments);
 }
 function _runGitMergeOnFolders() {
-    _runGitMergeOnFolders = _asyncToGenerator(function(foldersPathWithGitConfig) {
-        var commandType;
+    _runGitMergeOnFolders = _asyncToGenerator(function(foldersPathWithGitConfig, branchOrigin) {
+        var commandType, command;
         return __generator(this, function(_state) {
             commandType = _constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge;
+            command = commandType + " origin/" + branchOrigin;
             return [
                 2,
                 runCommandWithProgressNotification({
                     commandType: commandType,
                     foldersToCommandRun: foldersPathWithGitConfig,
                     processCommand: function processCommand(currentFolder) {
-                        runGitCommand(commandType, currentFolder);
+                        runGitCommand(command, currentFolder);
                     }
                 })
             ];

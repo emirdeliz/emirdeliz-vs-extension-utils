@@ -158,23 +158,18 @@ describe('runGitPullOnFolders', function () {
 		expect(utils.runGitPullOnFolders).toBeDefined();
 	});
 
-	it('runGitPullOnFolders should return expected output', function () {
-		let successfully = false;
-		const utilsSpy = { runGitPullOnFolders: utils.runGitPullOnFolders };
-		const runGitPullOnFoldersSpy = jest.spyOn(utilsSpy, 'runGitPullOnFolders');
+	it('runGitPullOnFolders should return expected output', async function () {
+		const runSpy = jest.spyOn(vscode.window, 'sendText');
+		runSpy.mockClear();
 
-		try {
-			const foldersPathWithGitConfig = [
-				{ name: 'repoOne' },
-				{ name: 'repoTwo' },
-			] as Array<vscode.WorkspaceFolder>;
-			utilsSpy.runGitPullOnFolders(foldersPathWithGitConfig);
-			successfully = true;
-		} catch (e) {
-			successfully = false;
-		}
-		expect(runGitPullOnFoldersSpy).toHaveBeenCalled();
-		expect(successfully).toBeTruthy();
+		const foldersPathWithGitConfig = [
+			{ name: 'repoOne' },
+			{ name: 'repoTwo' },
+		] as Array<vscode.WorkspaceFolder>;
+		await utils.runGitPullOnFolders(foldersPathWithGitConfig);
+		expect(runSpy).toHaveBeenCalledTimes(2);
+		expect(runSpy).toHaveBeenNthCalledWith(1, 'git -C repoOne pull');
+		expect(runSpy).toHaveBeenNthCalledWith(2, 'git -C repoTwo pull');
 	});
 });
 
@@ -183,26 +178,25 @@ describe('runGitMergeOnFolders', function () {
 		expect(utils.runGitMergeOnFolders).toBeDefined();
 	});
 
-	it('runGitMergeOnFolders should return expected output', function () {
-		let successfully = false;
-		const utilsSpy = { runGitMergeOnFolders: utils.runGitMergeOnFolders };
-		const runGitMergeOnFoldersSpy = jest.spyOn(
-			utilsSpy,
-			'runGitMergeOnFolders'
-		);
+	it('runGitMergeOnFolders should return expected output', async function () {
+		const runSpy = jest.spyOn(vscode.window, 'sendText');
+		runSpy.mockClear();
 
-		try {
-			const foldersPathWithGitConfig = [
-				{ name: 'repoOne' },
-				{ name: 'repoTwo' },
-			] as Array<vscode.WorkspaceFolder>;
-			utilsSpy.runGitMergeOnFolders(foldersPathWithGitConfig);
-			successfully = true;
-		} catch (e) {
-			successfully = false;
-		}
-		expect(runGitMergeOnFoldersSpy).toHaveBeenCalled();
-		expect(successfully).toBeTruthy();
+		const branchOrigin = 'feature/login';
+		const foldersPathWithGitConfig = [
+			{ name: 'repoOne' },
+			{ name: 'repoTwo' },
+		] as Array<vscode.WorkspaceFolder>;
+		await utils.runGitMergeOnFolders(foldersPathWithGitConfig, branchOrigin);
+		expect(runSpy).toHaveBeenCalledTimes(2);
+		expect(runSpy).toHaveBeenNthCalledWith(
+			1,
+			`git -C repoOne merge origin/${branchOrigin}`
+		);
+		expect(runSpy).toHaveBeenNthCalledWith(
+			2,
+			`git -C repoTwo merge origin/${branchOrigin}`
+		);
 	});
 });
 
