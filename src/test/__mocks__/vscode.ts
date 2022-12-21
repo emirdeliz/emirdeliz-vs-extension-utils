@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as constants from '../../constants';
 
@@ -65,8 +65,9 @@ export const workspace = {
 		.readdirSync(constants.EMIRDELIZ_TEST_WORKSPACE_PATH)
 		.map(function (folder) {
 			return {
+				name: folder,
 				uri: {
-					fsPath: `${constants.EMIRDELIZ_TEST_WORKSPACE_PATH}/${folder}`,
+					fsPath: folder,
 				},
 			};
 		}),

@@ -2,6 +2,8 @@ import * as utils from '../utils';
 import * as constants from '../constants';
 import * as vscode from './__mocks__/vscode';
 
+jest.mock('fs');
+
 describe('createVscodeTerminal', function () {
 	it('should expose a function', function () {
 		expect(utils.createVscodeTerminal).toBeDefined();
@@ -38,6 +40,53 @@ describe('runCommandOnVsTerminal', function () {
 		}
 		expect(runCommandOnVsTerminalSpy).toHaveBeenCalled();
 		expect(successfully).toBeTruthy();
+	});
+});
+
+describe('getAllFoldersInDir', function () {
+	it('should expose a function', function () {
+		expect(utils.getAllFoldersInDir).toBeDefined();
+	});
+
+	it('getAllFoldersInDir should return expected output', function () {
+		const folders = utils.getAllFoldersInDir(
+			constants.EMIRDELIZ_TEST_WORKSPACE_PATH
+		);
+		expect(folders).toHaveLength(5);
+		expect(folders[0]).toEqual('data');
+		expect(folders[1]).toEqual('extension');
+		expect(folders[2]).toEqual('repoOne');
+	});
+});
+
+describe('getWorkspaceFolders', function () {
+	it('should expose a function', function () {
+		expect(utils.getWorkspaceFolders).toBeDefined();
+	});
+
+	it(`getWorkspaceFolders should return expected output when hasn't a workspaceFile`, async function () {
+		jest
+			.spyOn({ ...utils }, 'checkIfHasWorkspaceFile')
+			.mockImplementation(function () {
+				return true;
+			});
+		const folders = utils.getWorkspaceFolders();
+		expect(folders).toEqual(vscode.workspace.workspaceFolders);
+	});
+
+	it('getWorkspaceFolders should return expected output when has a workspaceFile', async function () {
+		const foldersMock = ['data', 'extension', 'repoOne', 'repoTwo', 'swc'];
+		const foldersExpected = foldersMock.map(function (folder) {
+			return {
+				name: folder,
+				uri: {
+					fsPath: folder,
+				},
+			};
+		});
+
+		const folders = utils.getWorkspaceFolders();
+		expect(folders).toEqual(foldersExpected);
 	});
 });
 
@@ -201,7 +250,7 @@ describe('buildProgressTitle', function () {
 			'flut_base_web_blue_b...',
 		],
 	])(
-		'buildProgressTitle should return expected output when currentFolderName=%i and folderNameList=%i',
+		'buildProgressTitle should return expected output when currentFolderName=%s and folderNameList=%s',
 		async function (
 			currentFolder: vscode.WorkspaceFolder,
 			folderNameList: Array<vscode.WorkspaceFolder>,

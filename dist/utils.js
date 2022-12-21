@@ -21,6 +21,9 @@ _export(exports, {
     checkFolderHasGitConfig: function() {
         return checkFolderHasGitConfig;
     },
+    checkIfHasWorkspaceFile: function() {
+        return checkIfHasWorkspaceFile;
+    },
     runCommandOnVsTerminal: function() {
         return runCommandOnVsTerminal;
     },
@@ -36,8 +39,14 @@ _export(exports, {
     getVscodeTerminal: function() {
         return getVscodeTerminal;
     },
+    getAllFoldersInDir: function() {
+        return getAllFoldersInDir;
+    },
     getAllFoldersWithGitConfig: function() {
         return getAllFoldersWithGitConfig;
+    },
+    getWorkspaceFolders: function() {
+        return getWorkspaceFolders;
     },
     getPathFolderFocus: function() {
         return getPathFolderFocus;
@@ -52,7 +61,9 @@ _export(exports, {
         return isJestEnvironment;
     }
 });
+var _fs = require("fs");
 var _vscode = require("vscode");
+var _path = require("path");
 var _constants = require("./constants");
 function _arrayLikeToArray(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
@@ -260,6 +271,29 @@ function runGitCommand(command, workDir) {
     var commandWithMaybeWorkDir = "git " + (workDir ? "-C " + workDir.name + " " + command : "");
     return runCommandOnVsTerminal(commandWithMaybeWorkDir);
 }
+function getAllFoldersInDir(workspaceFolderBasePath) {
+    return _fs.readdirSync(workspaceFolderBasePath).filter(function(file) {
+        return _fs.statSync(workspaceFolderBasePath + "/" + file).isDirectory();
+    });
+}
+function getWorkspaceFolders() {
+    var hasWorkspaceFile = checkIfHasWorkspaceFile();
+    var workspaceFolders = _vscode.workspace.workspaceFolders;
+    if (hasWorkspaceFile || !(workspaceFolders == null ? void 0 : workspaceFolders.length)) {
+        return workspaceFolders || [];
+    }
+    var workspaceFolderBasePath = workspaceFolders[0].uri.fsPath;
+    var workspaceFoldersPath = workspaceFolderBasePath ? getAllFoldersInDir(workspaceFolderBasePath) : [];
+    var workspaceFoldersAsObject = workspaceFoldersPath.map(function(folderPath) {
+        return {
+            name: _path.basename(folderPath),
+            uri: {
+                fsPath: folderPath
+            }
+        };
+    });
+    return workspaceFoldersAsObject;
+}
 function getAllFoldersWithGitConfig(settingsKeyBase, settingsKeyGitIgnoreFolder) {
     return _getAllFoldersWithGitConfig.apply(this, arguments);
 }
@@ -269,7 +303,7 @@ function _getAllFoldersWithGitConfig() {
         return __generator(this, function(_state) {
             switch(_state.label){
                 case 0:
-                    workspaceFolders = _vscode.workspace.workspaceFolders || [];
+                    workspaceFolders = getWorkspaceFolders();
                     ignoreFolders = getSettingsByKey(settingsKeyBase, settingsKeyGitIgnoreFolder);
                     workspaceFoldersWithoutIgnoreFolders = workspaceFolders.reduce(function(result, folder) {
                         var isFolderToIgnore = ignoreFolders && ignoreFolders.includes(folder.name);
@@ -386,6 +420,10 @@ function _checkFolderHasGitConfig() {
         });
     });
     return _checkFolderHasGitConfig.apply(this, arguments);
+}
+function checkIfHasWorkspaceFile() {
+    var hasWorkspaceFile = !!_vscode.workspace.workspaceFile;
+    return hasWorkspaceFile;
 }
 function runCommandWithProgressNotification(_) {
     return _runCommandWithProgressNotification.apply(this, arguments);

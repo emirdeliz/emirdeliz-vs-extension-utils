@@ -51,7 +51,7 @@ var workspace = {
             entries: function entries() {
                 return {
                     next: function next() {
-                        return _fs.default.existsSync(include.toString());
+                        return _fs.existsSync(include.toString());
                     }
                 };
             }
@@ -71,10 +71,11 @@ var workspace = {
             })
         };
     },
-    workspaceFolders: _fs.default.readdirSync(_constants.EMIRDELIZ_TEST_WORKSPACE_PATH).map(function(folder) {
+    workspaceFolders: _fs.readdirSync(_constants.EMIRDELIZ_TEST_WORKSPACE_PATH).map(function(folder) {
         return {
+            name: folder,
             uri: {
-                fsPath: _constants.EMIRDELIZ_TEST_WORKSPACE_PATH + "/" + folder
+                fsPath: folder
             }
         };
     })

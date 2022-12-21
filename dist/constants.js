@@ -29,11 +29,10 @@ _export(exports, {
     }
 });
 var _path = require("path");
-var _utils = require("./utils");
 var EMIRDELIZ_EXTENSION_UTILS_NOTIFICATION_FOLDER_NAME_MAX_LENGTH = 20;
 var EMIRDELIZ_EXTENSION_UTILS_TERMINAL_PREFIX_NAME = "Ext utils";
 var EMIRDELIZ_EXTENSION_UTILS_VSCODE_SETTINGS_PREFIX = "emirdeliz-";
-var EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG = _utils.isJestEnvironment() ? "git" : ".git";
+var EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG = ".git";
 var EMIRDELIZ_TEST_WORKSPACE_PATH = _path.resolve("src", "test/__mocks__/folders");
 var EMIRDELIZ_TEST_WORKSPACE_FOLDER_FOCUS = _path.resolve("src", "utils");
 var EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS;

@@ -31,6 +31,20 @@ function _asyncToGenerator(fn) {
         });
     };
 }
+function _extends() {
+    _extends = Object.assign || function(target) {
+        for(var i = 1; i < arguments.length; i++){
+            var source = arguments[i];
+            for(var key in source){
+                if (Object.prototype.hasOwnProperty.call(source, key)) {
+                    target[key] = source[key];
+                }
+            }
+        }
+        return target;
+    };
+    return _extends.apply(this, arguments);
+}
 var __generator = (void 0) && (void 0).__generator || function(thisArg, body) {
     var f, y, t, g, _ = {
         label: 0,
@@ -126,6 +140,7 @@ var __generator = (void 0) && (void 0).__generator || function(thisArg, body) {
         };
     }
 };
+jest.mock("fs");
 describe("createVscodeTerminal", function() {
     it("should expose a function", function() {
         expect(_utils.createVscodeTerminal).toBeDefined();
@@ -156,6 +171,61 @@ describe("runCommandOnVsTerminal", function() {
         expect(runCommandOnVsTerminalSpy).toHaveBeenCalled();
         expect(successfully).toBeTruthy();
     });
+});
+describe("getAllFoldersInDir", function() {
+    it("should expose a function", function() {
+        expect(_utils.getAllFoldersInDir).toBeDefined();
+    });
+    it("getAllFoldersInDir should return expected output", function() {
+        var folders = _utils.getAllFoldersInDir(_constants.EMIRDELIZ_TEST_WORKSPACE_PATH);
+        expect(folders).toHaveLength(5);
+        expect(folders[0]).toEqual("data");
+        expect(folders[1]).toEqual("extension");
+        expect(folders[2]).toEqual("repoOne");
+    });
+});
+describe("getWorkspaceFolders", function() {
+    it("should expose a function", function() {
+        expect(_utils.getWorkspaceFolders).toBeDefined();
+    });
+    it("getWorkspaceFolders should return expected output when hasn't a workspaceFile", /*#__PURE__*/ _asyncToGenerator(function() {
+        var folders;
+        return __generator(this, function(_state) {
+            jest.spyOn(_extends({}, _utils), "checkIfHasWorkspaceFile").mockImplementation(function() {
+                return true;
+            });
+            folders = _utils.getWorkspaceFolders();
+            expect(folders).toEqual(_vscode.workspace.workspaceFolders);
+            return [
+                2
+            ];
+        });
+    }));
+    it("getWorkspaceFolders should return expected output when has a workspaceFile", /*#__PURE__*/ _asyncToGenerator(function() {
+        var foldersMock, foldersExpected, folders;
+        return __generator(this, function(_state) {
+            foldersMock = [
+                "data",
+                "extension",
+                "repoOne",
+                "repoTwo",
+                "swc"
+            ];
+            foldersExpected = foldersMock.map(function(folder) {
+                return {
+                    name: folder,
+                    uri: {
+                        fsPath: folder
+                    }
+                };
+            });
+            folders = _utils.getWorkspaceFolders();
+            expect(folders).toEqual(foldersExpected);
+            return [
+                2
+            ];
+        });
+    }));
 });
 describe("getAllFoldersWithGitConfig", function() {
     it("should expose a function", function() {
@@ -378,7 +448,7 @@ describe("buildProgressTitle", function() {
             ],
             "flut_base_web_blue_b..."
         ]
-    ])("buildProgressTitle should return expected output when currentFolderName=%i and folderNameList=%i", /*#__PURE__*/ _asyncToGenerator(function(currentFolder, folderNameList, currentFolderNameExpected) {
+    ])("buildProgressTitle should return expected output when currentFolderName=%s and folderNameList=%s", /*#__PURE__*/ _asyncToGenerator(function(currentFolder, folderNameList, currentFolderNameExpected) {
         var currentFolderIndex, progressTitle;
         return __generator(this, function(_state) {
             currentFolderIndex = folderNameList.indexOf(currentFolder) + 1;

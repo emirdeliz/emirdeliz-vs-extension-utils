@@ -6,8 +6,6 @@ import type { Config } from 'jest';
 
 const config = {
 	verbose: true,
-	// Automatically clear mock calls, instances, contexts and results before every test
-	clearMocks: true,
 	// A map from regular expressions to paths to transformers
 	transform: {
 		'^.+\\.(t|j)s?$': '@swc/jest',

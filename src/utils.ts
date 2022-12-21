@@ -56,11 +56,42 @@ function runGitCommand(command: string, workDir?: vscode.WorkspaceFolder) {
 	return runCommandOnVsTerminal(commandWithMaybeWorkDir);
 }
 
+function getAllFoldersInDir(workspaceFolderBasePath: string) {
+	return fs.readdirSync(workspaceFolderBasePath).filter(function (file) {
+		return fs.statSync(`${workspaceFolderBasePath}/${file}`).isDirectory();
+	});
+}
+
+function getWorkspaceFolders() {
+	const hasWorkspaceFile = checkIfHasWorkspaceFile();
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	if (hasWorkspaceFile || !workspaceFolders?.length) {
+		return workspaceFolders || [];
+	}
+
+	const workspaceFolderBasePath = workspaceFolders[0].uri.fsPath;
+	const workspaceFoldersPath = workspaceFolderBasePath
+		? getAllFoldersInDir(workspaceFolderBasePath)
+		: [];
+
+	const workspaceFoldersAsObject = workspaceFoldersPath.map(function (
+		folderPath
+	) {
+		return {
+			name: path.basename(folderPath),
+			uri: {
+				fsPath: folderPath,
+			},
+		};
+	});
+	return workspaceFoldersAsObject as Array<vscode.WorkspaceFolder>;
+}
+
 async function getAllFoldersWithGitConfig(
 	settingsKeyBase: string,
 	settingsKeyGitIgnoreFolder: string
 ) {
-	const workspaceFolders = vscode.workspace.workspaceFolders || [];
+	const workspaceFolders = getWorkspaceFolders();
 	const ignoreFolders = getSettingsByKey(
 		settingsKeyBase,
 		settingsKeyGitIgnoreFolder
@@ -106,6 +137,11 @@ async function checkFolderHasGitConfig(folderPath: string) {
 		folderPath,
 		EMIRDELIZ_EXTENSION_UTILS_GIT_NAME_FOLDER_CONFIG
 	);
+}
+
+function checkIfHasWorkspaceFile() {
+	const hasWorkspaceFile = !!vscode.workspace.workspaceFile;
+	return hasWorkspaceFile;
 }
 
 export async function runCommandWithProgressNotification({
@@ -218,12 +254,15 @@ export {
 	createVscodeTerminal,
 	checkFolderHasFolder,
 	checkFolderHasGitConfig,
+	checkIfHasWorkspaceFile,
 	runCommandOnVsTerminal,
 	runGitCommand,
 	runGitPullOnFolders,
 	runGitMergeOnFolders,
 	getVscodeTerminal,
+	getAllFoldersInDir,
 	getAllFoldersWithGitConfig,
+	getWorkspaceFolders,
 	getPathFolderFocus,
 	getSettingsByKey,
 	showVscodeProgress,
