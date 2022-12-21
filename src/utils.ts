@@ -187,7 +187,7 @@ async function runGitPullOnFolders(
 
 async function runGitMergeOnFolders(
 	foldersPathWithGitConfig: Array<vscode.WorkspaceFolder>,
-	branchOrigin: string
+	branchOrigin: string = constants.EMIRDELIZ_EXTENSION_UTILS_GIT_BRANCH_MERGE_DEFAULT
 ) {
 	const commandType = constants.EMIRDELIZ_EXTENSION_UTILS_GIT_COMMANDS.Merge;
 	const command = `${commandType} origin/${branchOrigin}`;
